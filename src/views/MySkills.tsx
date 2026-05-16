@@ -2317,7 +2317,7 @@ export function MySkills() {
                       return (
                         <div
                           className={cn(
-                            'app-panel relative flex h-full cursor-grabbing flex-col shadow-xl',
+                            'app-panel relative flex h-full cursor-grabbing flex-col shadow-xl opacity-70',
                             activeSkill.scenario_ids.includes(
                               viewedScenario?.id ?? '',
                             ) && 'border-l-2 border-l-accent',
@@ -2372,7 +2372,7 @@ export function MySkills() {
                     return (
                       <div
                         className={cn(
-                          'app-panel relative flex cursor-grabbing items-center gap-3.5 rounded-xl border-transparent px-3.5 py-3 shadow-xl',
+                          'app-panel relative flex cursor-grabbing items-center gap-3.5 rounded-xl border-transparent px-3.5 py-3 shadow-xl opacity-70',
                           activeSkill.scenario_ids.includes(
                             viewedScenario?.id ?? '',
                           ) && 'border-l-2 border-l-accent',
