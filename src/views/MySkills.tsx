@@ -55,7 +55,6 @@ import {
   DragOverlay,
   closestCenter,
   KeyboardSensor,
-  MeasuringStrategy,
   PointerSensor,
   useSensor,
   useSensors,
@@ -63,7 +62,6 @@ import {
   type DragMoveEvent,
   type DragStartEvent,
 } from '@dnd-kit/core'
-import { snapCenterToCursor } from '@dnd-kit/modifiers'
 import {
   SortableContext,
   sortableKeyboardCoordinates,
@@ -1730,7 +1728,6 @@ export function MySkills() {
           onDragMove={handleDragMove}
           onDragEnd={handleDragEnd}
           onDragCancel={handleDragCancel}
-          measuring={{ droppable: { strategy: MeasuringStrategy.Always } }}
         >
           <PresetDropChips scenarios={scenarios} />
           <SortableContext
@@ -2266,7 +2263,7 @@ export function MySkills() {
             </div>
           </SortableContext>
           {createPortal(
-            <DragOverlay modifiers={[snapCenterToCursor]}>
+            <DragOverlay>
               {activeDragId
                 ? (() => {
                     const activeSkill = filtered.find(
