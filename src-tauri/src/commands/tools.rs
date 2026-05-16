@@ -10,9 +10,9 @@ use crate::core::skill_store::SkillStore;
 use crate::core::sync_engine;
 use crate::core::tool_adapters::{self, CustomToolDef};
 use crate::core::tool_service::{
-    self, ToolInfo, get_custom_tool_paths, get_custom_tools, get_disabled_tools, get_tool_order,
+    self, get_custom_tool_paths, get_custom_tools, get_disabled_tools, get_tool_order,
     normalize_project_relative_skills_dir_input, normalize_skills_dir_input, set_custom_tool_paths,
-    set_custom_tools, set_disabled_tools, set_tool_order,
+    set_custom_tools, set_disabled_tools, set_tool_order, ToolInfo,
 };
 
 #[derive(Debug, Serialize)]

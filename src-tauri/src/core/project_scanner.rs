@@ -145,6 +145,10 @@ fn read_skills_from_dir(
     );
 }
 
+// Private recursive directory walker: the parameters are a cohesive traversal
+// context threaded unchanged through recursion; bundling into a struct adds
+// indirection without improving safety.
+#[allow(clippy::too_many_arguments)]
 fn read_skills_from_dir_recursive(
     root: &Path,
     current: &Path,
