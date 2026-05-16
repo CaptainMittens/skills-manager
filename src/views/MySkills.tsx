@@ -2021,195 +2021,59 @@ export function MySkills() {
                     disabled={!canDrag}
                   >
                     {(dragHandle) => (
-                      <div
-                        className={cn(
-                          'app-panel group relative flex cursor-pointer items-center gap-3.5 rounded-xl border-transparent px-3.5 py-3 transition-all hover:border-border hover:bg-surface-hover',
-                          enabledInScenario && 'border-l-2 border-l-accent',
-                          isMultiSelect &&
-                            selectedIds.has(skill.id) &&
-                            'ring-1 ring-accent border-accent/40',
-                        )}
-                        onClick={() =>
-                          isMultiSelect
-                            ? toggleSelect(skill.id)
-                            : openSkillDetailById(skill.id)
-                        }
-                      >
-                        {deletingIds.has(skill.id) && (
-                          <div className="absolute inset-0 z-20 flex items-center justify-center rounded-xl bg-surface/70 backdrop-blur-[1px]">
-                            <Loader2 className="h-5 w-5 animate-spin text-muted" />
-                          </div>
-                        )}
-                        {dragHandle}
-                        {isMultiSelect ? (
-                          selectedIds.has(skill.id) ? (
-                            <SquareCheck className="h-3.5 w-3.5 shrink-0 text-accent" />
-                          ) : (
-                            <Square className="h-3.5 w-3.5 shrink-0 text-faint" />
-                          )
-                        ) : isSynced ? (
-                          <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-emerald-500" />
-                        ) : (
-                          <Circle className="h-3.5 w-3.5 shrink-0 text-faint" />
-                        )}
-
-                        <h3
-                          className="w-[180px] shrink-0 truncate text-[14px] font-semibold text-secondary group-hover:text-primary"
-                          title={displayName}
-                        >
-                          {displayName}
-                        </h3>
-
-                        <p className="min-w-0 flex-1 truncate text-[13px] text-muted">
-                          {skill.description || '—'}
-                        </p>
-
-                        <div className="flex shrink-0 items-center gap-1.5">
-                          {skill.tags.map((tag) => (
-                            <span
-                              key={tag}
-                              className={cn(
-                                'inline-flex items-center rounded-full px-1.5 py-0.5 text-[11px] font-medium',
-                                getTagColor(tag, allTags),
-                              )}
-                            >
-                              {tag}
-                            </span>
-                          ))}
-                        </div>
-
-                        <div className="flex shrink-0 items-center gap-2.5">
-                          {badge && (
-                            <span
-                              className={cn(
-                                'rounded-full px-2 py-0.5 text-[12px] font-medium',
-                                badge.className,
-                              )}
-                            >
-                              {badge.label}
-                            </span>
-                          )}
-                          <SyncDots
-                            skill={skill}
-                            tools={tools}
-                            limit={6}
-                            size="sm"
-                            onToggle={
-                              isMultiSelect
-                                ? undefined
-                                : (tool, enabled) =>
-                                    handleToggleSkillTarget(
-                                      skill,
-                                      tool,
-                                      enabled,
-                                    )
-                            }
-                            pendingKey={
-                              togglingTarget?.skillId === skill.id
-                                ? togglingTarget.tool
-                                : null
-                            }
-                          />
-                          <span className="inline-flex items-center gap-1 text-[13px] text-muted">
-                            {sourceIcon(skill.source_type)}
-                            {sourceTypeLabel(skill)}
-                          </span>
-                          {enabledInScenario && (
-                            <span className="text-[13px] font-medium text-amber-600 dark:text-amber-400/80">
-                              {viewedScenarioName}
-                            </span>
-                          )}
-                        </div>
-
-                        <div
-                          className={cn(
-                            'flex shrink-0 items-center gap-1 opacity-0 transition-opacity',
-                            !isMultiSelect && 'group-hover:opacity-100',
-                          )}
-                        >
-                          {isMissingLocalSource && (
-                            <>
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation()
-                                  handleRelinkSource(skill)
-                                }}
-                                disabled={updatingSkillId === skill.id}
-                                className="rounded px-2 py-0.5 text-[13px] font-medium text-secondary transition-colors hover:bg-surface-hover disabled:opacity-50"
-                              >
-                                {t('mySkills.updateActions.relink')}
-                              </button>
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation()
-                                  handleDetachSource(skill)
-                                }}
-                                disabled={updatingSkillId === skill.id}
-                                className="rounded px-2 py-0.5 text-[13px] font-medium text-muted transition-colors hover:bg-surface-hover hover:text-secondary disabled:opacity-50"
-                              >
-                                {t('mySkills.updateActions.detachSource')}
-                              </button>
-                            </>
-                          )}
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              handleToggleScenario(skill)
-                            }}
-                            disabled={!viewedScenario}
-                            className={cn(
-                              'rounded px-2 py-0.5 text-[13px] font-medium transition-colors outline-none',
-                              enabledInScenario
-                                ? 'text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/10'
-                                : 'text-muted hover:bg-surface-hover hover:text-secondary',
-                            )}
-                          >
-                            {enabledInScenario
-                              ? t('mySkills.enabledButton')
-                              : t('mySkills.enable')}
-                          </button>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              handleCheckUpdate(skill)
-                            }}
-                            disabled={checkingSkillId === skill.id}
-                            className="rounded p-0.5 text-muted transition-colors hover:bg-surface-hover hover:text-secondary disabled:opacity-50"
-                            title={t('mySkills.updateActions.check')}
-                          >
-                            <RefreshCw
-                              className={cn(
-                                'h-3.5 w-3.5',
-                                checkingSkillId === skill.id && 'animate-spin',
-                              )}
+                      <SkillCard
+                        variant="list"
+                        skill={skill}
+                        displayName={displayName}
+                        isSynced={isSynced}
+                        badge={badge}
+                        enabledInScenario={enabledInScenario}
+                        viewedScenarioName={viewedScenarioName}
+                        allTags={allTags}
+                        tools={tools}
+                        actions={{
+                          dragHandle,
+                          isMultiSelect,
+                          isSelected: selectedIds.has(skill.id),
+                          isDeleting: deletingIds.has(skill.id),
+                          isChecking: checkingSkillId === skill.id,
+                          isUpdating: updatingSkillId === skill.id,
+                          canRefresh: canRefresh(skill),
+                          isMissingLocalSource,
+                          togglingTool:
+                            togglingTarget?.skillId === skill.id
+                              ? togglingTarget.tool
+                              : null,
+                          onCardClick: () =>
+                            isMultiSelect
+                              ? toggleSelect(skill.id)
+                              : openSkillDetailById(skill.id),
+                          onCheckUpdate: () => handleCheckUpdate(skill),
+                          onRefresh: () => handleRefreshSkill(skill),
+                          onRelinkSource: () => handleRelinkSource(skill),
+                          onDetachSource: () => handleDetachSource(skill),
+                          onToggleScenario: () => handleToggleScenario(skill),
+                          onToggleTool: (tool, enabled) =>
+                            handleToggleSkillTarget(skill, tool, enabled),
+                          onRemoveTag: (tag) => handleRemoveTag(skill, tag),
+                          tagEditing: tagEditSkillId === skill.id,
+                          tagInput,
+                          tagInputRef:
+                            tagInputRef as React.RefObject<HTMLInputElement>,
+                          tagOptions: getTagOptions(skill, tagInput),
+                          onTagInputChange: setTagInput,
+                          onAddTag: (value) => handleAddTag(skill, value),
+                          onBeginTagEdit: () => setTagEditSkillId(skill.id),
+                          onCancelTagEdit: () => setTagEditSkillId(null),
+                          deleteSlot: (
+                            <DeleteSkillButton
+                              skill={skill}
+                              onConfirm={handleDeleteSkill}
+                              buttonClassName="p-0.5"
                             />
-                          </button>
-                          {canRefresh(skill) ? (
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation()
-                                handleRefreshSkill(skill)
-                              }}
-                              disabled={updatingSkillId === skill.id}
-                              className="rounded p-0.5 text-accent-light transition-colors hover:bg-accent-bg disabled:opacity-50"
-                              title={refreshLabel(skill)}
-                            >
-                              <RotateCcw
-                                className={cn(
-                                  'h-3.5 w-3.5',
-                                  updatingSkillId === skill.id &&
-                                    'animate-spin',
-                                )}
-                              />
-                            </button>
-                          ) : null}
-                          <DeleteSkillButton
-                            skill={skill}
-                            onConfirm={handleDeleteSkill}
-                            buttonClassName="p-0.5"
-                          />
-                        </div>
-                      </div>
+                          ),
+                        }}
+                      />
                     )}
                   </SortableSkillItem>
                 )
