@@ -191,6 +191,38 @@ npm run tauri:build
 npm run cli:build
 ```
 
+## 贡献 / 开发环境配置
+
+首次提交前，请先安装所有必要的工具链组件，确保预提交检查门能够通过：
+
+```bash
+# 安装 Node 依赖（包含 ESLint、Prettier、Vitest、TypeScript）
+npm install
+
+# 添加所需 Rust 组件
+rustup component add rust-analyzer clippy rustfmt
+```
+
+每次提交都会触发一个通过 [Lefthook](https://github.com/evilmartians/lefthook) 运行的**阻断式预提交检查门**，以下所有检查项必须全部通过：
+
+| 检查项      | 命令                                                               |
+| ----------- | ------------------------------------------------------------------ |
+| ESLint      | `npx eslint .`                                                     |
+| TypeScript  | `npx tsc -b --noEmit`                                              |
+| Prettier    | `npx prettier --check .`                                           |
+| Rust 格式化 | `cargo fmt --manifest-path src-tauri/Cargo.toml --check`           |
+| Clippy      | `cargo clippy --manifest-path src-tauri/Cargo.toml -- -D warnings` |
+
+可选辅助命令：
+
+```bash
+# 提交前自动修复格式问题
+npm run format
+
+# 运行 Vitest 冒烟测试套件
+npm test
+```
+
 ## 常见问题
 
 ### macOS 首次启动被 Gatekeeper 拦截
