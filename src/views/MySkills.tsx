@@ -52,6 +52,7 @@ import {
   DndContext,
   closestCenter,
   KeyboardSensor,
+  MeasuringStrategy,
   PointerSensor,
   useSensor,
   useSensors,
@@ -1638,6 +1639,7 @@ export function MySkills() {
           sensors={sensors}
           collisionDetection={closestCenter}
           onDragEnd={handleDragEnd}
+          measuring={{ droppable: { strategy: MeasuringStrategy.Always } }}
         >
           <PresetDropChips scenarios={scenarios} />
           <SortableContext
