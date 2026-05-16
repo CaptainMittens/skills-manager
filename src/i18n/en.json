@@ -749,7 +749,9 @@
     "statusPartial": "{{installed}} / {{total}}",
     "statusInactive": "Not added",
     "activate": "Activate",
-    "deactivate": "Deactivate"
+    "deactivate": "Deactivate",
+    "alreadyInPreset": "Already in this preset",
+    "addedToPresetToast": "Added to preset"
   },
   "presetBar": {
     "shiftClickHint": "{{name}} · Shift+click to toggle",

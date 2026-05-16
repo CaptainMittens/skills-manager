@@ -749,7 +749,9 @@
     "statusPartial": "{{installed}} / {{total}}",
     "statusInactive": "未添加",
     "activate": "激活",
-    "deactivate": "取消激活"
+    "deactivate": "取消激活",
+    "alreadyInPreset": "已在该预设中",
+    "addedToPresetToast": "已加入预设"
   },
   "presetBar": {
     "shiftClickHint": "{{name}} · Shift+点击直接切换",
