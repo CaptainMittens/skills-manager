@@ -38,7 +38,6 @@ import { GitSetupDialog } from '../components/GitSetupDialog'
 import { GitRecoveryDialog } from '../components/GitRecoveryDialog'
 import { SyncDots } from '../components/SyncDots'
 import { PresetDropChips } from '../components/PresetDropChips'
-import { DndProbe } from '../components/__DndProbe'
 import { createPortal } from 'react-dom'
 import * as api from '../lib/tauri'
 import { getTagActiveColor, getTagColor } from '../lib/skillTags'
@@ -63,7 +62,6 @@ import {
   useSensors,
   type CollisionDetection,
   type DragEndEvent,
-  type DragMoveEvent,
   type DragStartEvent,
 } from '@dnd-kit/core'
 import {
@@ -74,8 +72,6 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-
-import { setDndProbe } from '../lib/dndProbeState'
 
 const collisionDetectionStrategy: CollisionDetection = (args) => {
   const pointerCollisions = pointerWithin(args)
@@ -393,93 +389,13 @@ export function MySkills() {
     [filtered, viewedScenario, scenarios, tagSkillToPreset, setActiveDragId],
   )
 
-  // ---------- probe handlers ----------
-  const _rafPending = useRef(false)
-
   const handleDragStart = useCallback((e: DragStartEvent) => {
     setActiveDragId(String(e.active.id))
-    try {
-      const ae = e.activatorEvent as PointerEvent | undefined
-      // NOTE: active.rect.current.initial is legitimately null at onDragStart time.
-      // @dnd-kit sets activeRects.current.initial = draggingNodeRect, but
-      // draggingNodeRect is null while status===Initializing (isInitialized=false,
-      // core.esm.js:2948). The initial rect is only populated after the first
-      // render following drag activation. We capture it in onDragMove instead.
-      setDndProbe({
-        activeId: String(e.active.id),
-        activatorClientX: ae?.clientX ?? null,
-        activatorClientY: ae?.clientY ?? null,
-        initialLeft: null,
-        initialTop: null,
-        initialWidth: null,
-        initialHeight: null,
-        translatedLeft: null,
-        translatedTop: null,
-        deltaX: null,
-        deltaY: null,
-        overId: null,
-        overLeft: null,
-        overTop: null,
-        overWidth: null,
-        overHeight: null,
-      })
-    } catch {
-      /* probe never blocks drag */
-    }
-  }, [])
-
-  const handleDragMove = useCallback((e: DragMoveEvent) => {
-    if (_rafPending.current) return
-    _rafPending.current = true
-    requestAnimationFrame(() => {
-      _rafPending.current = false
-      try {
-        // active.rect.current.initial is populated once Status.Initialized is
-        // reached (after activeNodeRect is first measured). Read it here so the
-        // probe reflects the true source-card base rect.
-        setDndProbe({
-          initialLeft: e.active.rect.current.initial?.left ?? null,
-          initialTop: e.active.rect.current.initial?.top ?? null,
-          initialWidth: e.active.rect.current.initial?.width ?? null,
-          initialHeight: e.active.rect.current.initial?.height ?? null,
-          translatedLeft: e.active.rect.current.translated?.left ?? null,
-          translatedTop: e.active.rect.current.translated?.top ?? null,
-          deltaX: e.delta.x,
-          deltaY: e.delta.y,
-          overId: e.over ? String(e.over.id) : null,
-          overLeft: e.over?.rect.left ?? null,
-          overTop: e.over?.rect.top ?? null,
-          overWidth: e.over?.rect.width ?? null,
-          overHeight: e.over?.rect.height ?? null,
-        })
-      } catch {
-        /* probe never blocks drag */
-      }
-    })
   }, [])
 
   const handleDragCancel = useCallback(() => {
     setActiveDragId(null)
-    setDndProbe({
-      activeId: null,
-      activatorClientX: null,
-      activatorClientY: null,
-      initialLeft: null,
-      initialTop: null,
-      initialWidth: null,
-      initialHeight: null,
-      translatedLeft: null,
-      translatedTop: null,
-      deltaX: null,
-      deltaY: null,
-      overId: null,
-      overLeft: null,
-      overTop: null,
-      overWidth: null,
-      overHeight: null,
-    })
   }, [])
-  // ---------- end probe handlers ----------
 
   const canDrag = !!viewedScenario
 
@@ -1400,7 +1316,6 @@ export function MySkills() {
 
   return (
     <div className="app-page">
-      <DndProbe />
       <div className="app-page-header pr-2 pb-1 flex items-center justify-between gap-3">
         <h1 className="app-page-title flex items-center gap-2">
           {t('mySkills.title')}
@@ -1764,7 +1679,6 @@ export function MySkills() {
             },
           }}
           onDragStart={handleDragStart}
-          onDragMove={handleDragMove}
           onDragEnd={handleDragEnd}
           onDragCancel={handleDragCancel}
         >
