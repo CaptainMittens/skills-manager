@@ -74,8 +74,10 @@
 2. 打开 **设置 → Git 同步配置**，保存远程仓库地址。
 3. 打开 **我的 Skills** 页面。
 4. 二选一：
+
 - 已有远程仓库：点击 **开始备份**，按已配置地址克隆。
 - 首次本地初始化：点击 **开始备份** 初始化本地仓库，再使用 **同步到 Git**。
+
 5. 在我的 Skills 顶部工具栏点击 **同步到 Git**。
 
 `同步到 Git` 会根据仓库状态自动处理拉取/提交/推送。
@@ -100,13 +102,13 @@ Cursor · Claude Code · Codex · OpenCode · Amp · Kilo Code · Roo Code · Go
 
 ## 技术栈
 
-| 层 | 技术 |
-|----|------|
-| 前端 | React 19、TypeScript、Vite、Tailwind CSS |
-| 桌面 | Tauri 2 |
-| 后端 | Rust |
-| 存储 | SQLite（`rusqlite`） |
-| 国际化 | react-i18next |
+| 层     | 技术                                     |
+| ------ | ---------------------------------------- |
+| 前端   | React 19、TypeScript、Vite、Tailwind CSS |
+| 桌面   | Tauri 2                                  |
+| 后端   | Rust                                     |
+| 存储   | SQLite（`rusqlite`）                     |
+| 国际化 | react-i18next                            |
 
 ## 快速开始
 
@@ -150,6 +152,7 @@ npm run cli -- git commit -m "chore: update skills"
 ```
 
 可用命令分组：
+
 - `repo`：查看或修改当前 base directory
 - `tools`：列出已检测到的工具目标与路径
 - `skills`：列出、查看、导出技能
@@ -157,6 +160,7 @@ npm run cli -- git commit -m "chore: update skills"
 - `git`：操作 git 管理的 `skills/` 仓库（`clone`、`pull`、`push`、`commit`、`versions`、`restore`）
 
 额外参数：
+
 - `--skills-root <path>`：直接针对某个已 clone / 已导出的 skills repo 操作，而不是本机 app 默认目录。manager 的状态（DB、scenarios、cache、logs）会落在 `~/.skills-manager/external/<name>-<hash>/`，按 skills root 的规范化路径分目录隔离，外部仓库本身保持干净。
 - `--json`：给脚本 / agent 使用的机器可读输出
 

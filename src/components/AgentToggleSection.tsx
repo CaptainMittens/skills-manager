@@ -1,23 +1,29 @@
-import { useState } from "react";
-import { CheckCircle2, ChevronDown, ChevronUp, Circle, Loader2 } from "lucide-react";
-import { useTranslation } from "react-i18next";
-import { cn } from "../utils";
-import { AgentIcon } from "./AgentIcon";
+import { useState } from 'react'
+import {
+  CheckCircle2,
+  ChevronDown,
+  ChevronUp,
+  Circle,
+  Loader2,
+} from 'lucide-react'
+import { useTranslation } from 'react-i18next'
+import { cn } from '../utils'
+import { AgentIcon } from './AgentIcon'
 
 export interface AgentToggleItem {
-  key: string;
-  displayName: string;
-  enabled: boolean;
-  isAvailable: boolean;
-  disabled?: boolean;
-  badgeLabel?: string | null;
+  key: string
+  displayName: string
+  enabled: boolean
+  isAvailable: boolean
+  disabled?: boolean
+  badgeLabel?: string | null
 }
 
 interface Props {
-  items: AgentToggleItem[];
-  togglingKey?: string | null;
-  onToggle: (key: string, enabled: boolean) => void;
-  className?: string;
+  items: AgentToggleItem[]
+  togglingKey?: string | null
+  onToggle: (key: string, enabled: boolean) => void
+  className?: string
 }
 
 export function AgentToggleSection({
@@ -26,21 +32,25 @@ export function AgentToggleSection({
   onToggle,
   className,
 }: Props) {
-  const { t } = useTranslation();
-  const [showUnavailable, setShowUnavailable] = useState(false);
+  const { t } = useTranslation()
+  const [showUnavailable, setShowUnavailable] = useState(false)
 
-  const availableItems = items.filter((item) => item.isAvailable);
-  const unavailableItems = items.filter((item) => !item.isAvailable);
-  const enabledAvailableCount = availableItems.filter((item) => item.enabled).length;
+  const availableItems = items.filter((item) => item.isAvailable)
+  const unavailableItems = items.filter((item) => !item.isAvailable)
+  const enabledAvailableCount = availableItems.filter(
+    (item) => item.enabled,
+  ).length
 
   return (
-    <div className={cn("rounded-xl border border-border-subtle", className)}>
+    <div className={cn('rounded-xl border border-border-subtle', className)}>
       <div className="border-b border-border-subtle px-6 py-2.5">
         <div className="flex items-center justify-between gap-2 text-[13px]">
           <div className="flex min-w-0 items-center gap-2">
-            <span className="font-medium text-secondary">{t("mySkills.agentTogglesTitle")}</span>
+            <span className="font-medium text-secondary">
+              {t('mySkills.agentTogglesTitle')}
+            </span>
             <span className="rounded-full border border-border-subtle bg-surface px-2 py-0.5 text-[12px] text-muted">
-              {t("mySkills.syncSummary", {
+              {t('mySkills.syncSummary', {
                 synced: enabledAvailableCount,
                 total: availableItems.length,
               })}
@@ -68,8 +78,16 @@ export function AgentToggleSection({
               onClick={() => setShowUnavailable((prev) => !prev)}
               className="inline-flex items-center gap-1 text-[12px] text-muted transition-colors hover:text-secondary"
             >
-              {showUnavailable ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
-              <span>{t("mySkills.agentUnavailableCount", { count: unavailableItems.length })}</span>
+              {showUnavailable ? (
+                <ChevronUp className="h-3 w-3" />
+              ) : (
+                <ChevronDown className="h-3 w-3" />
+              )}
+              <span>
+                {t('mySkills.agentUnavailableCount', {
+                  count: unavailableItems.length,
+                })}
+              </span>
             </button>
             {showUnavailable && (
               <div className="mt-1.5 grid grid-cols-2 gap-1.5 md:grid-cols-3">
@@ -87,7 +105,7 @@ export function AgentToggleSection({
         )}
       </div>
     </div>
-  );
+  )
 }
 
 function AgentToggle({
@@ -95,21 +113,23 @@ function AgentToggle({
   loading,
   onToggle,
 }: {
-  item: AgentToggleItem;
-  loading: boolean;
-  onToggle: (key: string, enabled: boolean) => void;
+  item: AgentToggleItem
+  loading: boolean
+  onToggle: (key: string, enabled: boolean) => void
 }) {
-  const disabled = Boolean(item.disabled || loading);
+  const disabled = Boolean(item.disabled || loading)
   return (
     <button
       type="button"
       onClick={() => onToggle(item.key, !item.enabled)}
       disabled={disabled}
       className={cn(
-        "flex w-full items-center gap-2 rounded-[6px] border px-2 py-1.5 text-left text-[12px] transition-colors",
-        item.enabled ? "border-border bg-surface" : "border-border-subtle bg-bg-secondary",
-        !disabled && "hover:bg-surface-hover",
-        disabled && "opacity-55"
+        'flex w-full items-center gap-2 rounded-[6px] border px-2 py-1.5 text-left text-[12px] transition-colors',
+        item.enabled
+          ? 'border-border bg-surface'
+          : 'border-border-subtle bg-bg-secondary',
+        !disabled && 'hover:bg-surface-hover',
+        disabled && 'opacity-55',
       )}
       title={item.badgeLabel ?? undefined}
     >
@@ -136,5 +156,5 @@ function AgentToggle({
         </span>
       )}
     </button>
-  );
+  )
 }

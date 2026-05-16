@@ -1,31 +1,36 @@
-import { useEffect } from "react";
-import { Outlet, useNavigate } from "react-router-dom";
-import { Sidebar } from "./Sidebar";
-import { StatusBanner } from "./StatusBanner";
-import { CommandPalette } from "./CommandPalette";
-import { useApp } from "../context/AppContext";
-import { useTranslation } from "react-i18next";
-import { useDragWindow } from "../hooks/useDragWindow";
+import { useEffect } from 'react'
+import { Outlet, useNavigate } from 'react-router-dom'
+import { Sidebar } from './Sidebar'
+import { StatusBanner } from './StatusBanner'
+import { CommandPalette } from './CommandPalette'
+import { useApp } from '../context/AppContext'
+import { useTranslation } from 'react-i18next'
+import { useDragWindow } from '../hooks/useDragWindow'
 
 export function Layout() {
-  const { t } = useTranslation();
-  const { appError, refreshAppData } = useApp();
-  const onDrag = useDragWindow();
-  const navigate = useNavigate();
+  const { t } = useTranslation()
+  const { appError, refreshAppData } = useApp()
+  const onDrag = useDragWindow()
+  const navigate = useNavigate()
 
   // Cmd+, to open Settings
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === ",") {
-        const target = e.target as HTMLElement;
-        if (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable) return;
-        e.preventDefault();
-        navigate("/settings");
+      if ((e.metaKey || e.ctrlKey) && e.key === ',') {
+        const target = e.target as HTMLElement
+        if (
+          target.tagName === 'INPUT' ||
+          target.tagName === 'TEXTAREA' ||
+          target.isContentEditable
+        )
+          return
+        e.preventDefault()
+        navigate('/settings')
       }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [navigate]);
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [navigate])
 
   return (
     <div className="relative flex h-full w-full overflow-hidden bg-background text-primary">
@@ -41,9 +46,9 @@ export function Layout() {
             {appError ? (
               <StatusBanner
                 compact
-                title={t("common.dataOutOfDate")}
+                title={t('common.dataOutOfDate')}
                 description={appError}
-                actionLabel={t("common.retry")}
+                actionLabel={t('common.retry')}
                 onAction={refreshAppData}
                 tone="danger"
               />
@@ -54,5 +59,5 @@ export function Layout() {
       </div>
       <CommandPalette />
     </div>
-  );
+  )
 }

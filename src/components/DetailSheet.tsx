@@ -1,16 +1,16 @@
-import { createPortal } from "react-dom";
-import { X } from "lucide-react";
-import type { ReactNode } from "react";
+import { createPortal } from 'react-dom'
+import { X } from 'lucide-react'
+import type { ReactNode } from 'react'
 
-const IS_MACOS = navigator.userAgent.includes("Mac");
+const IS_MACOS = navigator.userAgent.includes('Mac')
 
 interface DetailSheetProps {
-  open: boolean;
-  title: ReactNode;
-  description?: ReactNode;
-  meta?: ReactNode;
-  onClose: () => void;
-  children: ReactNode;
+  open: boolean
+  title: ReactNode
+  description?: ReactNode
+  meta?: ReactNode
+  onClose: () => void
+  children: ReactNode
 }
 
 export function DetailSheet({
@@ -21,15 +21,15 @@ export function DetailSheet({
   onClose,
   children,
 }: DetailSheetProps) {
-  if (!open) return null;
+  if (!open) return null
 
   return createPortal(
     <div className="fixed top-[28px] right-0 bottom-0 left-[220px] z-40 isolate">
       <div
         className={
           IS_MACOS
-            ? "absolute inset-0 z-0 bg-black/65"
-            : "absolute inset-0 z-0 bg-black/60 backdrop-blur-sm"
+            ? 'absolute inset-0 z-0 bg-black/65'
+            : 'absolute inset-0 z-0 bg-black/60 backdrop-blur-sm'
         }
         onClick={onClose}
       />
@@ -45,13 +45,15 @@ export function DetailSheet({
             <span className="block">{title}</span>
           </h2>
           {description ? (
-            <div className="text-[15px] leading-7 text-secondary">{description}</div>
+            <div className="text-[15px] leading-7 text-secondary">
+              {description}
+            </div>
           ) : null}
           {meta ? <div className="mt-4">{meta}</div> : null}
           <div className="mt-5">{children}</div>
         </div>
       </div>
     </div>,
-    document.body
-  );
+    document.body,
+  )
 }

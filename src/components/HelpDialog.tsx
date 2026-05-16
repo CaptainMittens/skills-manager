@@ -1,14 +1,33 @@
-import { BookOpen, FolderTree, Globe, Layers3, Map, RefreshCw, Settings2, Sparkles, X } from "lucide-react";
-import { useTranslation } from "react-i18next";
-import { useApp } from "../context/AppContext";
+import {
+  BookOpen,
+  FolderTree,
+  Globe,
+  Layers3,
+  Map,
+  RefreshCw,
+  Settings2,
+  Sparkles,
+  X,
+} from 'lucide-react'
+import { useTranslation } from 'react-i18next'
+import { useApp } from '../context/AppContext'
 
-const GUIDE_ICONS = [Map, Layers3, BookOpen, Sparkles, Globe, FolderTree, RefreshCw, Settings2];
+const GUIDE_ICONS = [
+  Map,
+  Layers3,
+  BookOpen,
+  Sparkles,
+  Globe,
+  FolderTree,
+  RefreshCw,
+  Settings2,
+]
 
 export function HelpDialog() {
-  const { t } = useTranslation();
-  const { helpOpen, closeHelp } = useApp();
+  const { t } = useTranslation()
+  const { helpOpen, closeHelp } = useApp()
 
-  if (!helpOpen) return null;
+  if (!helpOpen) return null
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 px-6 backdrop-blur-sm">
@@ -18,10 +37,14 @@ export function HelpDialog() {
           <div className="flex items-start justify-between gap-4">
             <div>
               <p className="text-[13px] font-semibold uppercase tracking-[0.18em] text-faint">
-                {t("help.eyebrow")}
+                {t('help.eyebrow')}
               </p>
-              <h2 className="mt-2 text-[20px] font-semibold text-primary">{t("help.title")}</h2>
-              <p className="mt-1 text-[13px] text-muted">{t("help.description")}</p>
+              <h2 className="mt-2 text-[20px] font-semibold text-primary">
+                {t('help.title')}
+              </h2>
+              <p className="mt-1 text-[13px] text-muted">
+                {t('help.description')}
+              </p>
             </div>
             <button
               type="button"
@@ -34,8 +57,19 @@ export function HelpDialog() {
         </div>
 
         <div className="max-h-[min(72vh,720px)] space-y-3 overflow-y-auto px-5 py-5">
-          {(["workflows", "scenarios", "install", "sync", "global", "projects", "backup", "settings"] as const).map((key, index) => {
-            const Icon = GUIDE_ICONS[index];
+          {(
+            [
+              'workflows',
+              'scenarios',
+              'install',
+              'sync',
+              'global',
+              'projects',
+              'backup',
+              'settings',
+            ] as const
+          ).map((key, index) => {
+            const Icon = GUIDE_ICONS[index]
             return (
               <div
                 key={key}
@@ -45,14 +79,18 @@ export function HelpDialog() {
                   <Icon className="h-4 w-4" />
                 </div>
                 <div>
-                  <h3 className="text-[13px] font-semibold text-secondary">{t(`help.items.${key}.title`)}</h3>
-                  <p className="mt-1 text-[13px] leading-5 text-muted">{t(`help.items.${key}.description`)}</p>
+                  <h3 className="text-[13px] font-semibold text-secondary">
+                    {t(`help.items.${key}.title`)}
+                  </h3>
+                  <p className="mt-1 text-[13px] leading-5 text-muted">
+                    {t(`help.items.${key}.description`)}
+                  </p>
                 </div>
               </div>
-            );
+            )
           })}
         </div>
       </div>
     </div>
-  );
+  )
 }

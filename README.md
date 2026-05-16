@@ -83,8 +83,10 @@ Back up the `skills/` folder inside your current central repository to a Git rep
 2. Open **Settings → Git Sync Configuration** and save your remote URL.
 3. Open **My Skills**.
 4. Choose one:
+
 - Existing remote: click **Start Backup** to clone from the configured remote.
 - New local repo: click **Start Backup** to initialize locally, then use **Sync to Git**.
+
 5. Use **Sync to Git** from the My Skills toolbar.
 
 `Sync to Git` automatically handles pull, commit, and push based on current repo status.
@@ -109,13 +111,13 @@ The **Help** button in **Settings** mirrors the current product flow: recommende
 
 ## Tech Stack
 
-| Layer | Tech |
-|-------|------|
+| Layer    | Tech                                     |
+| -------- | ---------------------------------------- |
 | Frontend | React 19, TypeScript, Vite, Tailwind CSS |
-| Desktop | Tauri 2 |
-| Backend | Rust |
-| Storage | SQLite (`rusqlite`) |
-| i18n | react-i18next |
+| Desktop  | Tauri 2                                  |
+| Backend  | Rust                                     |
+| Storage  | SQLite (`rusqlite`)                      |
+| i18n     | react-i18next                            |
 
 ## Getting Started
 
@@ -159,6 +161,7 @@ npm run cli -- git commit -m "chore: update skills"
 ```
 
 Available command groups:
+
 - `repo` — inspect or change the configured base directory
 - `tools` — list detected tool targets and paths
 - `skills` — list, inspect, and export skills
@@ -166,6 +169,7 @@ Available command groups:
 - `git` — operate on the git-backed `skills/` repository (`clone`, `pull`, `push`, `commit`, `versions`, `restore`)
 
 Extra flags:
+
 - `--skills-root <path>` — operate on a cloned/exported skills repo directly instead of the local app default. The manager's state (DB, scenarios, cache, logs) lives in `~/.skills-manager/external/<name>-<hash>/`, namespaced by the canonical path of the skills root, so the external checkout itself stays clean.
 - `--json` — machine-readable output for scripts/agents
 

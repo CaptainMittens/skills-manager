@@ -1,32 +1,32 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { Toaster } from "sonner";
-import { AppProvider } from "./context/AppContext";
-import { ThemeProvider, useThemeContext } from "./context/ThemeContext";
-import { HelpDialog } from "./components/HelpDialog";
-import { CloseActionGuard } from "./components/CloseActionGuard";
-import { Layout } from "./components/Layout";
-import { Dashboard } from "./views/Dashboard";
-import { MySkills } from "./views/MySkills";
-import { GlobalWorkspace } from "./views/GlobalWorkspace";
-import { InstallSkills } from "./views/InstallSkills";
-import { Settings } from "./views/Settings";
-import { ProjectDetail } from "./views/ProjectDetail";
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { Toaster } from 'sonner'
+import { AppProvider } from './context/AppContext'
+import { ThemeProvider, useThemeContext } from './context/ThemeContext'
+import { HelpDialog } from './components/HelpDialog'
+import { CloseActionGuard } from './components/CloseActionGuard'
+import { Layout } from './components/Layout'
+import { Dashboard } from './views/Dashboard'
+import { MySkills } from './views/MySkills'
+import { GlobalWorkspace } from './views/GlobalWorkspace'
+import { InstallSkills } from './views/InstallSkills'
+import { Settings } from './views/Settings'
+import { ProjectDetail } from './views/ProjectDetail'
 
 function ThemedToaster() {
-  const { resolvedTheme } = useThemeContext();
+  const { resolvedTheme } = useThemeContext()
   return (
     <Toaster
       theme={resolvedTheme}
       position="bottom-right"
       toastOptions={{
         style: {
-          background: "var(--color-surface)",
-          border: "1px solid var(--color-border)",
-          color: "var(--color-text-primary)",
+          background: 'var(--color-surface)',
+          border: '1px solid var(--color-border)',
+          color: 'var(--color-text-primary)',
         },
       }}
     />
-  );
+  )
 }
 
 function App() {
@@ -39,7 +39,10 @@ function App() {
               <Route path="/" element={<Dashboard />} />
               <Route path="/my-skills" element={<MySkills />} />
               <Route path="/global-workspace" element={<GlobalWorkspace />} />
-              <Route path="/global-workspace/:agentKey" element={<GlobalWorkspace />} />
+              <Route
+                path="/global-workspace/:agentKey"
+                element={<GlobalWorkspace />}
+              />
               <Route path="/install" element={<InstallSkills />} />
               <Route path="/project/:id" element={<ProjectDetail />} />
               <Route path="/settings" element={<Settings />} />
@@ -51,7 +54,7 @@ function App() {
         <ThemedToaster />
       </AppProvider>
     </ThemeProvider>
-  );
+  )
 }
 
-export default App;
+export default App

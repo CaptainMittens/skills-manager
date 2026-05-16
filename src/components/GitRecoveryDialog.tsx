@@ -1,51 +1,56 @@
-import { useState } from "react";
-import { X, AlertTriangle, RotateCcw, GitBranch } from "lucide-react";
-import { useTranslation } from "react-i18next";
-import { toast } from "sonner";
-import { cn } from "../utils";
-import type { GitUpstreamHealth } from "../lib/tauri";
+import { useState } from 'react'
+import { X, AlertTriangle, RotateCcw, GitBranch } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
+import { toast } from 'sonner'
+import { cn } from '../utils'
+import type { GitUpstreamHealth } from '../lib/tauri'
 
 interface Props {
-  open: boolean;
-  health: GitUpstreamHealth;
-  onClose: () => void;
-  onReclone: () => Promise<void>;
+  open: boolean
+  health: GitUpstreamHealth
+  onClose: () => void
+  onReclone: () => Promise<void>
 }
 
 export function GitRecoveryDialog({ open, health, onClose, onReclone }: Props) {
-  const { t } = useTranslation();
-  const [loading, setLoading] = useState<"reclone" | null>(null);
+  const { t } = useTranslation()
+  const [loading, setLoading] = useState<'reclone' | null>(null)
 
-  if (!open) return null;
+  if (!open) return null
 
   const subtitleKey =
-    health === "unrelated_histories"
-      ? "settings.gitRecoverySubtitleUnrelated"
-      : health === "no_upstream"
-        ? "settings.gitRecoverySubtitleNoUpstream"
-        : "settings.gitRecoverySubtitleDetached";
+    health === 'unrelated_histories'
+      ? 'settings.gitRecoverySubtitleUnrelated'
+      : health === 'no_upstream'
+        ? 'settings.gitRecoverySubtitleNoUpstream'
+        : 'settings.gitRecoverySubtitleDetached'
 
   const handleReclone = async () => {
-    setLoading("reclone");
+    setLoading('reclone')
     try {
-      await onReclone();
-      onClose();
+      await onReclone()
+      onClose()
     } finally {
-      setLoading(null);
+      setLoading(null)
     }
-  };
+  }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => !loading && onClose()} />
+      <div
+        className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+        onClick={() => !loading && onClose()}
+      />
       <div className="relative bg-surface border border-border rounded-xl w-full max-w-lg p-5 shadow-2xl">
         <div className="mb-4 flex items-start justify-between gap-3">
           <div>
             <h2 className="flex items-center gap-2 text-[14px] font-semibold text-primary">
               <AlertTriangle className="h-4 w-4 text-red-500" />
-              {t("settings.gitRecoveryTitle")}
+              {t('settings.gitRecoveryTitle')}
             </h2>
-            <p className="mt-1 text-[12px] text-muted leading-relaxed">{t(subtitleKey)}</p>
+            <p className="mt-1 text-[12px] text-muted leading-relaxed">
+              {t(subtitleKey)}
+            </p>
           </div>
           <button
             onClick={() => !loading && onClose()}
@@ -62,8 +67,8 @@ export function GitRecoveryDialog({ open, health, onClose, onReclone }: Props) {
             onClick={handleReclone}
             disabled={!!loading}
             className={cn(
-              "w-full text-left rounded-md border border-accent bg-accent-bg px-3 py-3 transition-colors outline-none",
-              "disabled:cursor-not-allowed disabled:opacity-60 hover:bg-accent-bg/80"
+              'w-full text-left rounded-md border border-accent bg-accent-bg px-3 py-3 transition-colors outline-none',
+              'disabled:cursor-not-allowed disabled:opacity-60 hover:bg-accent-bg/80',
             )}
           >
             <div className="flex items-center gap-2">
@@ -71,19 +76,19 @@ export function GitRecoveryDialog({ open, health, onClose, onReclone }: Props) {
                 <RotateCcw className="h-4 w-4" />
               </span>
               <span className="text-[13px] font-semibold text-primary">
-                {loading === "reclone"
-                  ? t("settings.gitRecoveryRecloning")
-                  : t("settings.gitRecoveryCardRecloneTitle")}
+                {loading === 'reclone'
+                  ? t('settings.gitRecoveryRecloning')
+                  : t('settings.gitRecoveryCardRecloneTitle')}
               </span>
             </div>
             <p className="mt-1.5 pl-7 text-[12px] text-tertiary leading-relaxed">
-              {t("settings.gitRecoveryCardRecloneDesc")}
+              {t('settings.gitRecoveryCardRecloneDesc')}
             </p>
           </button>
 
           <button
             type="button"
-            onClick={() => toast.info(t("settings.gitRecoveryFallbackHint"))}
+            onClick={() => toast.info(t('settings.gitRecoveryFallbackHint'))}
             disabled={!!loading}
             className="w-full text-left rounded-md border border-border-subtle bg-bg-secondary px-3 py-3 transition-colors outline-none hover:bg-surface-hover disabled:cursor-not-allowed disabled:opacity-60"
           >
@@ -92,11 +97,11 @@ export function GitRecoveryDialog({ open, health, onClose, onReclone }: Props) {
                 <GitBranch className="h-4 w-4" />
               </span>
               <span className="text-[13px] font-semibold text-primary">
-                {t("settings.gitRecoveryCardKeepLocalTitle")}
+                {t('settings.gitRecoveryCardKeepLocalTitle')}
               </span>
             </div>
             <p className="mt-1.5 pl-7 text-[12px] text-tertiary leading-relaxed">
-              {t("settings.gitRecoveryCardKeepLocalDesc")}
+              {t('settings.gitRecoveryCardKeepLocalDesc')}
             </p>
           </button>
         </div>
@@ -107,10 +112,10 @@ export function GitRecoveryDialog({ open, health, onClose, onReclone }: Props) {
             disabled={!!loading}
             className="px-3 py-1.5 rounded-[4px] text-[13px] font-medium text-tertiary hover:text-secondary hover:bg-surface-hover transition-colors outline-none disabled:opacity-50"
           >
-            {t("common.cancel")}
+            {t('common.cancel')}
           </button>
         </div>
       </div>
     </div>
-  );
+  )
 }

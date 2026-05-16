@@ -1,41 +1,49 @@
-import { Trash2, CheckCircle2, Circle, RotateCcw, Tag, Download, Upload } from "lucide-react";
-import { cn } from "../utils";
+import {
+  Trash2,
+  CheckCircle2,
+  Circle,
+  RotateCcw,
+  Tag,
+  Download,
+  Upload,
+} from 'lucide-react'
+import { cn } from '../utils'
 
 interface MultiSelectToolbarLabels {
-  hint: string;
-  selected: string;
-  update?: string;
-  updateProject?: string;
-  updateCenter?: string;
-  delete: string;
-  enable: string;
-  disable: string;
-  selectAll: string;
-  deselectAll: string;
-  cancel: string;
-  editTags?: string;
+  hint: string
+  selected: string
+  update?: string
+  updateProject?: string
+  updateCenter?: string
+  delete: string
+  enable: string
+  disable: string
+  selectAll: string
+  deselectAll: string
+  cancel: string
+  editTags?: string
 }
 
 interface MultiSelectToolbarProps {
-  selectedCount: number;
-  isAllSelected: boolean;
-  anyDisabled: boolean;
-  anyUpdatable?: boolean;
-  anyCanUpdateProject?: boolean;
-  anyCanUpdateCenter?: boolean;
-  showToggle: boolean;
-  updating?: boolean;
-  updatingProject?: boolean;
-  updatingCenter?: boolean;
-  labels: MultiSelectToolbarLabels;
-  onUpdate?: () => void;
-  onUpdateProject?: () => void;
-  onUpdateCenter?: () => void;
-  onDelete: () => void;
-  onToggle: () => void;
-  onSelectAll: () => void;
-  onCancel: () => void;
-  onEditTags?: () => void;
+  selectedCount: number
+  isAllSelected: boolean
+  anyDisabled: boolean
+  anyUpdatable?: boolean
+  anyCanUpdateProject?: boolean
+  anyCanUpdateCenter?: boolean
+  showToggle: boolean
+  updating?: boolean
+  updatingProject?: boolean
+  updatingCenter?: boolean
+  labels: MultiSelectToolbarLabels
+  onUpdate?: () => void
+  onUpdateProject?: () => void
+  onUpdateCenter?: () => void
+  onDelete: () => void
+  onToggle: () => void
+  onSelectAll: () => void
+  onCancel: () => void
+  onEditTags?: () => void
 }
 
 export function MultiSelectToolbar({
@@ -72,7 +80,9 @@ export function MultiSelectToolbar({
               disabled={updating}
               className="inline-flex items-center gap-1.5 rounded-md bg-accent px-2.5 py-1 text-[13px] font-medium text-white transition-colors hover:opacity-90 disabled:opacity-50"
             >
-              <RotateCcw className={cn("h-3.5 w-3.5", updating && "animate-spin")} />
+              <RotateCcw
+                className={cn('h-3.5 w-3.5', updating && 'animate-spin')}
+              />
               {labels.update}
             </button>
           )}
@@ -82,7 +92,9 @@ export function MultiSelectToolbar({
               disabled={updatingProject}
               className="inline-flex items-center gap-1.5 rounded-md bg-sky-600/90 px-2.5 py-1 text-[13px] font-medium text-white hover:bg-sky-500 transition-colors disabled:opacity-50"
             >
-              <Download className={cn("h-3.5 w-3.5", updatingProject && "animate-spin")} />
+              <Download
+                className={cn('h-3.5 w-3.5', updatingProject && 'animate-spin')}
+              />
               {labels.updateProject}
             </button>
           )}
@@ -92,7 +104,9 @@ export function MultiSelectToolbar({
               disabled={updatingCenter}
               className="inline-flex items-center gap-1.5 rounded-md bg-amber-600/90 px-2.5 py-1 text-[13px] font-medium text-white hover:bg-amber-500 transition-colors disabled:opacity-50"
             >
-              <Upload className={cn("h-3.5 w-3.5", updatingCenter && "animate-spin")} />
+              <Upload
+                className={cn('h-3.5 w-3.5', updatingCenter && 'animate-spin')}
+              />
               {labels.updateCenter}
             </button>
           )}
@@ -116,15 +130,17 @@ export function MultiSelectToolbar({
             <button
               onClick={onToggle}
               className={cn(
-                "inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-[13px] font-medium text-white transition-colors",
+                'inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-[13px] font-medium text-white transition-colors',
                 anyDisabled
-                  ? "bg-emerald-600/90 hover:bg-emerald-500"
-                  : "bg-amber-600/90 hover:bg-amber-500"
+                  ? 'bg-emerald-600/90 hover:bg-emerald-500'
+                  : 'bg-amber-600/90 hover:bg-amber-500',
               )}
             >
-              {anyDisabled
-                ? <CheckCircle2 className="h-3.5 w-3.5" />
-                : <Circle className="h-3.5 w-3.5" />}
+              {anyDisabled ? (
+                <CheckCircle2 className="h-3.5 w-3.5" />
+              ) : (
+                <Circle className="h-3.5 w-3.5" />
+              )}
               {anyDisabled ? labels.enable : labels.disable}
             </button>
           )}
@@ -143,5 +159,5 @@ export function MultiSelectToolbar({
         {labels.cancel}
       </button>
     </div>
-  );
+  )
 }

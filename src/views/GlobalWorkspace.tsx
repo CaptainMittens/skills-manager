@@ -1,6 +1,13 @@
-import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { createPortal } from "react-dom";
-import { useParams, useNavigate } from "react-router-dom";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from 'react'
+import { createPortal } from 'react-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import {
   ChevronRight,
   Download,
@@ -15,34 +22,34 @@ import {
   Trash2,
   Upload,
   X,
-} from "lucide-react";
-import { useTranslation } from "react-i18next";
-import { toast } from "sonner";
-import { cn } from "../utils";
-import { useApp } from "../context/AppContext";
-import { ConfirmDialog } from "../components/ConfirmDialog";
-import { PresetBar } from "../components/PresetBar";
-import { AgentIcon } from "../components/AgentIcon";
-import { DetailSheet } from "../components/DetailSheet";
-import { SkillMarkdown } from "../components/SkillMarkdown";
-import { DocumentDiffViewer } from "../components/DocumentDiffViewer";
-import * as api from "../lib/tauri";
-import type { ManagedSkill, ProjectSkill, ToolInfo } from "../lib/tauri";
-import { getErrorMessage } from "../lib/error";
-import { getTagActiveColor, getTagColor } from "../lib/skillTags";
+} from 'lucide-react'
+import { useTranslation } from 'react-i18next'
+import { toast } from 'sonner'
+import { cn } from '../utils'
+import { useApp } from '../context/AppContext'
+import { ConfirmDialog } from '../components/ConfirmDialog'
+import { PresetBar } from '../components/PresetBar'
+import { AgentIcon } from '../components/AgentIcon'
+import { DetailSheet } from '../components/DetailSheet'
+import { SkillMarkdown } from '../components/SkillMarkdown'
+import { DocumentDiffViewer } from '../components/DocumentDiffViewer'
+import * as api from '../lib/tauri'
+import type { ManagedSkill, ProjectSkill, ToolInfo } from '../lib/tauri'
+import { getErrorMessage } from '../lib/error'
+import { getTagActiveColor, getTagColor } from '../lib/skillTags'
 
 function compactHomePath(path: string) {
-  return path.replace(/^\/Users\/[^/]+/, "~");
+  return path.replace(/^\/Users\/[^/]+/, '~')
 }
 
 interface WorkspaceSkillCardTag {
-  label: string;
-  className: string;
+  label: string
+  className: string
 }
 
 interface WorkspaceSkillCardStatus {
-  label: string;
-  className: string;
+  label: string
+  className: string
 }
 
 function WorkspaceSkillCard({
@@ -57,23 +64,23 @@ function WorkspaceSkillCard({
   actionsHover = false,
   onClick,
 }: {
-  viewMode: "grid" | "list";
-  title: string;
-  description?: string | null;
-  tags?: WorkspaceSkillCardTag[];
-  status: WorkspaceSkillCardStatus;
-  fileCount?: number;
-  active?: boolean;
-  actions?: ReactNode;
-  actionsHover?: boolean;
-  onClick: () => void;
+  viewMode: 'grid' | 'list'
+  title: string
+  description?: string | null
+  tags?: WorkspaceSkillCardTag[]
+  status: WorkspaceSkillCardStatus
+  fileCount?: number
+  active?: boolean
+  actions?: ReactNode
+  actionsHover?: boolean
+  onClick: () => void
 }) {
-  if (viewMode === "list") {
+  if (viewMode === 'list') {
     return (
       <div
         className={cn(
-          "app-panel group relative flex cursor-pointer items-center gap-3.5 rounded-xl border-transparent px-3.5 py-3 transition-all hover:border-border hover:bg-surface-hover",
-          active && "border-l-2 border-l-accent"
+          'app-panel group relative flex cursor-pointer items-center gap-3.5 rounded-xl border-transparent px-3.5 py-3 transition-all hover:border-border hover:bg-surface-hover',
+          active && 'border-l-2 border-l-accent',
         )}
         onClick={onClick}
       >
@@ -84,7 +91,7 @@ function WorkspaceSkillCard({
           {title}
         </h3>
         <p className="min-w-0 flex-1 truncate text-[13px] text-muted">
-          {description || "-"}
+          {description || '-'}
         </p>
         {tags.length > 0 && (
           <div className="flex shrink-0 items-center gap-1.5">
@@ -92,8 +99,8 @@ function WorkspaceSkillCard({
               <span
                 key={tag.label}
                 className={cn(
-                  "inline-flex items-center rounded-full px-1.5 py-0.5 text-[11px] font-medium",
-                  tag.className
+                  'inline-flex items-center rounded-full px-1.5 py-0.5 text-[11px] font-medium',
+                  tag.className,
                 )}
               >
                 {tag.label}
@@ -102,7 +109,12 @@ function WorkspaceSkillCard({
           </div>
         )}
         <div className="flex shrink-0 items-center gap-2.5">
-          <span className={cn("rounded-full px-2 py-0.5 text-[12px] font-medium", status.className)}>
+          <span
+            className={cn(
+              'rounded-full px-2 py-0.5 text-[12px] font-medium',
+              status.className,
+            )}
+          >
             {status.label}
           </span>
           {fileCount > 0 && (
@@ -115,22 +127,23 @@ function WorkspaceSkillCard({
         {actions && (
           <div
             className={cn(
-              "flex shrink-0 items-center gap-1",
-              actionsHover && "opacity-0 transition-opacity group-hover:opacity-100"
+              'flex shrink-0 items-center gap-1',
+              actionsHover &&
+                'opacity-0 transition-opacity group-hover:opacity-100',
             )}
           >
             {actions}
           </div>
         )}
       </div>
-    );
+    )
   }
 
   return (
     <div
       className={cn(
-        "app-panel group relative flex h-full cursor-pointer flex-col overflow-hidden transition-all hover:border-border hover:bg-surface-hover",
-        active && "border-l-2 border-l-accent"
+        'app-panel group relative flex h-full cursor-pointer flex-col overflow-hidden transition-all hover:border-border hover:bg-surface-hover',
+        active && 'border-l-2 border-l-accent',
       )}
       onClick={onClick}
     >
@@ -150,7 +163,7 @@ function WorkspaceSkillCard({
       </div>
       <div className="px-3.5 pb-3">
         <p className="truncate text-[13px] leading-[18px] text-muted">
-          {description || "-"}
+          {description || '-'}
         </p>
         {tags.length > 0 && (
           <div className="mt-2 flex flex-wrap items-center gap-1">
@@ -158,8 +171,8 @@ function WorkspaceSkillCard({
               <span
                 key={tag.label}
                 className={cn(
-                  "inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium",
-                  tag.className
+                  'inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium',
+                  tag.className,
                 )}
               >
                 {tag.label}
@@ -169,42 +182,52 @@ function WorkspaceSkillCard({
         )}
       </div>
       <div className="mt-auto flex items-center justify-between gap-2 border-t border-border-subtle px-3.5 py-2.5">
-        <span className={cn("rounded-full px-2 py-0.5 text-[12px] font-medium", status.className)}>
+        <span
+          className={cn(
+            'rounded-full px-2 py-0.5 text-[12px] font-medium',
+            status.className,
+          )}
+        >
           {status.label}
         </span>
-        {actions && <div className="flex shrink-0 items-center gap-1.5">{actions}</div>}
+        {actions && (
+          <div className="flex shrink-0 items-center gap-1.5">{actions}</div>
+        )}
       </div>
     </div>
-  );
+  )
 }
 
-function getLocalStatusMeta(t: (key: string) => string, status: ProjectSkill["sync_status"]) {
+function getLocalStatusMeta(
+  t: (key: string) => string,
+  status: ProjectSkill['sync_status'],
+) {
   switch (status) {
-    case "in_sync":
+    case 'in_sync':
       return {
-        label: t("globalWorkspace.localSkills.status.inSync"),
-        className: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
-      };
-    case "project_newer":
+        label: t('globalWorkspace.localSkills.status.inSync'),
+        className: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
+      }
+    case 'project_newer':
       return {
-        label: t("globalWorkspace.localSkills.status.localNewer"),
-        className: "bg-amber-500/10 text-amber-700 dark:text-amber-300",
-      };
-    case "center_newer":
+        label: t('globalWorkspace.localSkills.status.localNewer'),
+        className: 'bg-amber-500/10 text-amber-700 dark:text-amber-300',
+      }
+    case 'center_newer':
       return {
-        label: t("globalWorkspace.localSkills.status.centerNewer"),
-        className: "bg-sky-500/10 text-sky-700 dark:text-sky-300",
-      };
-    case "diverged":
+        label: t('globalWorkspace.localSkills.status.centerNewer'),
+        className: 'bg-sky-500/10 text-sky-700 dark:text-sky-300',
+      }
+    case 'diverged':
       return {
-        label: t("globalWorkspace.localSkills.status.diverged"),
-        className: "bg-violet-500/10 text-violet-700 dark:text-violet-300",
-      };
+        label: t('globalWorkspace.localSkills.status.diverged'),
+        className: 'bg-violet-500/10 text-violet-700 dark:text-violet-300',
+      }
     default:
       return {
-        label: t("globalWorkspace.localSkills.status.localOnly"),
-        className: "bg-surface-hover text-muted",
-      };
+        label: t('globalWorkspace.localSkills.status.localOnly'),
+        className: 'bg-surface-hover text-muted',
+      }
   }
 }
 
@@ -215,47 +238,49 @@ function AddSkillDialog({
   onAdd,
   onClose,
 }: {
-  agent: ToolInfo;
-  managedSkills: ManagedSkill[];
-  installedSkillIds: Set<string>;
-  onAdd: (skillIds: string[]) => Promise<void>;
-  onClose: () => void;
+  agent: ToolInfo
+  managedSkills: ManagedSkill[]
+  installedSkillIds: Set<string>
+  onAdd: (skillIds: string[]) => Promise<void>
+  onClose: () => void
 }) {
-  const { t } = useTranslation();
-  const [search, setSearch] = useState("");
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-  const [adding, setAdding] = useState(false);
+  const { t } = useTranslation()
+  const [search, setSearch] = useState('')
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+  const [adding, setAdding] = useState(false)
 
   const available = useMemo(
     () =>
       managedSkills.filter(
         (skill) =>
           !installedSkillIds.has(skill.id) &&
-          (search === "" ||
+          (search === '' ||
             skill.name.toLowerCase().includes(search.toLowerCase()) ||
-            (skill.description || "").toLowerCase().includes(search.toLowerCase()))
+            (skill.description || '')
+              .toLowerCase()
+              .includes(search.toLowerCase())),
       ),
-    [installedSkillIds, managedSkills, search]
-  );
+    [installedSkillIds, managedSkills, search],
+  )
 
   const toggleSelect = (skillId: string) => {
     setSelectedIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(skillId)) next.delete(skillId);
-      else next.add(skillId);
-      return next;
-    });
-  };
+      const next = new Set(prev)
+      if (next.has(skillId)) next.delete(skillId)
+      else next.add(skillId)
+      return next
+    })
+  }
 
   const handleAdd = async () => {
-    if (selectedIds.size === 0) return;
-    setAdding(true);
+    if (selectedIds.size === 0) return
+    setAdding(true)
     try {
-      await onAdd(Array.from(selectedIds));
+      await onAdd(Array.from(selectedIds))
     } finally {
-      setAdding(false);
+      setAdding(false)
     }
-  };
+  }
 
   return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -266,7 +291,9 @@ function AddSkillDialog({
       <div className="relative flex max-h-[calc(100vh-2rem)] w-full max-w-lg flex-col overflow-hidden rounded-xl border border-border-subtle bg-bg-secondary shadow-2xl">
         <div className="flex shrink-0 items-center justify-between border-b border-border-subtle px-5 py-4">
           <h2 className="text-[14px] font-semibold text-primary">
-            {t("globalWorkspace.addSkillDialogTitle", { agent: agent.display_name })}
+            {t('globalWorkspace.addSkillDialogTitle', {
+              agent: agent.display_name,
+            })}
           </h2>
           <button
             onClick={onClose}
@@ -284,7 +311,7 @@ function AddSkillDialog({
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder={t("globalWorkspace.addSkillSearch")}
+              placeholder={t('globalWorkspace.addSkillSearch')}
               className="app-input w-full pl-8"
               autoFocus
             />
@@ -294,46 +321,54 @@ function AddSkillDialog({
         <div className="min-h-0 flex-1 overflow-y-auto scrollbar-hide">
           {available.length === 0 ? (
             <div className="py-12 text-center text-[13px] text-muted">
-              {installedSkillIds.size >= managedSkills.length && search === ""
-                ? t("globalWorkspace.allInstalled")
-                : t("globalWorkspace.noSkillsMatch")}
+              {installedSkillIds.size >= managedSkills.length && search === ''
+                ? t('globalWorkspace.allInstalled')
+                : t('globalWorkspace.noSkillsMatch')}
             </div>
           ) : (
             <div className="divide-y divide-border-subtle">
               {available.map((skill) => {
-                const selected = selectedIds.has(skill.id);
+                const selected = selectedIds.has(skill.id)
                 return (
                   <button
                     key={skill.id}
                     onClick={() => toggleSelect(skill.id)}
                     disabled={adding}
                     className={cn(
-                      "flex w-full items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-surface-hover",
-                      selected && "bg-accent-bg"
+                      'flex w-full items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-surface-hover',
+                      selected && 'bg-accent-bg',
                     )}
                   >
                     <div
                       className={cn(
-                        "flex h-4 w-4 shrink-0 items-center justify-center rounded border transition-colors",
+                        'flex h-4 w-4 shrink-0 items-center justify-center rounded border transition-colors',
                         selected
-                          ? "border-accent bg-accent text-white"
-                          : "border-border bg-transparent"
+                          ? 'border-accent bg-accent text-white'
+                          : 'border-border bg-transparent',
                       )}
                     >
                       {selected && (
-                        <svg viewBox="0 0 16 16" fill="currentColor" className="h-3 w-3">
+                        <svg
+                          viewBox="0 0 16 16"
+                          fill="currentColor"
+                          className="h-3 w-3"
+                        >
                           <path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z" />
                         </svg>
                       )}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <div className="truncate text-[13px] font-medium text-primary">{skill.name}</div>
+                      <div className="truncate text-[13px] font-medium text-primary">
+                        {skill.name}
+                      </div>
                       {skill.description && (
-                        <div className="mt-0.5 truncate text-[12px] text-muted">{skill.description}</div>
+                        <div className="mt-0.5 truncate text-[12px] text-muted">
+                          {skill.description}
+                        </div>
                       )}
                     </div>
                   </button>
-                );
+                )
               })}
             </div>
           )}
@@ -346,7 +381,7 @@ function AddSkillDialog({
               disabled={adding}
               className="rounded-md border border-border-subtle px-3 py-2 text-[13px] font-medium text-muted transition-colors hover:border-border hover:text-secondary disabled:opacity-50"
             >
-              {t("common.cancel")}
+              {t('common.cancel')}
             </button>
             <button
               onClick={handleAdd}
@@ -354,331 +389,414 @@ function AddSkillDialog({
               className="inline-flex min-w-[120px] items-center justify-center gap-1.5 rounded-md bg-accent px-3 py-2 text-[13px] font-medium text-white transition-colors hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-50"
             >
               {adding ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
-              {t("globalWorkspace.addButton", { count: selectedIds.size })}
+              {t('globalWorkspace.addButton', { count: selectedIds.size })}
             </button>
           </div>
         </div>
       </div>
     </div>,
-    document.body
-  );
+    document.body,
+  )
 }
 
 export function GlobalWorkspace() {
-  const { agentKey } = useParams<{ agentKey?: string }>();
-  const navigate = useNavigate();
-  const { t } = useTranslation();
-  const { tools, managedSkills, scenarios, refreshManagedSkills, refreshTools } = useApp();
+  const { agentKey } = useParams<{ agentKey?: string }>()
+  const navigate = useNavigate()
+  const { t } = useTranslation()
+  const {
+    tools,
+    managedSkills,
+    scenarios,
+    refreshManagedSkills,
+    refreshTools,
+  } = useApp()
 
-  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
-  const [search, setSearch] = useState("");
-  const [tagFilters, setTagFilters] = useState<Set<string>>(new Set());
-  const [addDialogOpen, setAddDialogOpen] = useState(false);
-  const [removingLocalSkillId, setRemovingLocalSkillId] = useState<string | null>(null);
-  const [localSkills, setLocalSkills] = useState<ProjectSkill[]>([]);
-  const [localSkillsLoading, setLocalSkillsLoading] = useState(false);
-  const [localActionKey, setLocalActionKey] = useState<string | null>(null);
-  const [localDetailSkill, setLocalDetailSkill] = useState<ProjectSkill | null>(null);
-  const [localDocContent, setLocalDocContent] = useState<string | null>(null);
-  const [localCenterDocContent, setLocalCenterDocContent] = useState<string | null>(null);
-  const [localDocLoading, setLocalDocLoading] = useState(false);
-  const [localCenterDocLoading, setLocalCenterDocLoading] = useState(false);
-  const [localContentTab, setLocalContentTab] = useState<"local" | "diff" | "center">("local");
-  const [uploadConfirmSkill, setUploadConfirmSkill] = useState<ProjectSkill | null>(null);
-  const [pullConfirmSkill, setPullConfirmSkill] = useState<ProjectSkill | null>(null);
-  const localDetailRequestRef = useRef(0);
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
+  const [search, setSearch] = useState('')
+  const [tagFilters, setTagFilters] = useState<Set<string>>(new Set())
+  const [addDialogOpen, setAddDialogOpen] = useState(false)
+  const [removingLocalSkillId, setRemovingLocalSkillId] = useState<
+    string | null
+  >(null)
+  const [localSkills, setLocalSkills] = useState<ProjectSkill[]>([])
+  const [localSkillsLoading, setLocalSkillsLoading] = useState(false)
+  const [localActionKey, setLocalActionKey] = useState<string | null>(null)
+  const [localDetailSkill, setLocalDetailSkill] = useState<ProjectSkill | null>(
+    null,
+  )
+  const [localDocContent, setLocalDocContent] = useState<string | null>(null)
+  const [localCenterDocContent, setLocalCenterDocContent] = useState<
+    string | null
+  >(null)
+  const [localDocLoading, setLocalDocLoading] = useState(false)
+  const [localCenterDocLoading, setLocalCenterDocLoading] = useState(false)
+  const [localContentTab, setLocalContentTab] = useState<
+    'local' | 'diff' | 'center'
+  >('local')
+  const [uploadConfirmSkill, setUploadConfirmSkill] =
+    useState<ProjectSkill | null>(null)
+  const [pullConfirmSkill, setPullConfirmSkill] = useState<ProjectSkill | null>(
+    null,
+  )
+  const localDetailRequestRef = useRef(0)
 
-  const installedTools = useMemo(() => tools.filter((t) => t.installed && t.enabled), [tools]);
+  const installedTools = useMemo(
+    () => tools.filter((t) => t.installed && t.enabled),
+    [tools],
+  )
 
   const presetBarAgentKeys = useMemo(
-    () => agentKey ? [agentKey] : installedTools.map((t) => t.key),
-    [agentKey, installedTools]
-  );
+    () => (agentKey ? [agentKey] : installedTools.map((t) => t.key)),
+    [agentKey, installedTools],
+  )
 
   const skillCountByAgent = useMemo(() => {
-    const map: Record<string, number> = {};
+    const map: Record<string, number> = {}
     for (const tool of installedTools) {
       map[tool.key] = managedSkills.filter((s) =>
-        s.targets.some((target) => target.tool === tool.key)
-      ).length;
+        s.targets.some((target) => target.tool === tool.key),
+      ).length
     }
-    return map;
-  }, [installedTools, managedSkills]);
+    return map
+  }, [installedTools, managedSkills])
 
   const currentTool = useMemo(
-    () => (agentKey ? tools.find((t) => t.key === agentKey) ?? null : null),
-    [agentKey, tools]
-  );
-  const currentToolKey = currentTool?.key ?? null;
+    () => (agentKey ? (tools.find((t) => t.key === agentKey) ?? null) : null),
+    [agentKey, tools],
+  )
+  const currentToolKey = currentTool?.key ?? null
 
-  const localSkillsRequestRef = useRef(0);
+  const localSkillsRequestRef = useRef(0)
   const loadLocalSkills = useCallback(async () => {
-    const requestId = ++localSkillsRequestRef.current;
+    const requestId = ++localSkillsRequestRef.current
     if (!currentToolKey) {
-      setLocalSkills([]);
-      return;
+      setLocalSkills([])
+      return
     }
-    setLocalSkillsLoading(true);
+    setLocalSkillsLoading(true)
     try {
-      const skills = await api.getGlobalLocalSkills(currentToolKey);
-      if (localSkillsRequestRef.current === requestId) setLocalSkills(skills);
+      const skills = await api.getGlobalLocalSkills(currentToolKey)
+      if (localSkillsRequestRef.current === requestId) setLocalSkills(skills)
     } catch (error: unknown) {
       if (localSkillsRequestRef.current === requestId) {
-        toast.error(getErrorMessage(error, t("common.error")));
-        setLocalSkills([]);
+        toast.error(getErrorMessage(error, t('common.error')))
+        setLocalSkills([])
       }
     } finally {
-      if (localSkillsRequestRef.current === requestId) setLocalSkillsLoading(false);
+      if (localSkillsRequestRef.current === requestId)
+        setLocalSkillsLoading(false)
     }
-  }, [currentToolKey, t]);
+  }, [currentToolKey, t])
 
   // Fetch agent-local skills once per agent. Guarding on the key (not the
   // loadLocalSkills identity) keeps this from re-firing every time the tools
   // array is refetched or React StrictMode re-runs the effect.
-  const loadedAgentKeyRef = useRef<string | null>(null);
+  const loadedAgentKeyRef = useRef<string | null>(null)
   useEffect(() => {
     if (!currentToolKey) {
-      loadedAgentKeyRef.current = null;
-      setLocalSkills([]);
-      return;
+      loadedAgentKeyRef.current = null
+      setLocalSkills([])
+      return
     }
-    if (loadedAgentKeyRef.current === currentToolKey) return;
-    loadedAgentKeyRef.current = currentToolKey;
-    void loadLocalSkills();
+    if (loadedAgentKeyRef.current === currentToolKey) return
+    loadedAgentKeyRef.current = currentToolKey
+    void loadLocalSkills()
     // On unmount or agent switch, invalidate this in-flight load so its result
     // (or error toast) can't land on the next page / an unmounted component.
     return () => {
-      localSkillsRequestRef.current += 1;
-    };
-  }, [currentToolKey, loadLocalSkills]);
+      localSkillsRequestRef.current += 1
+    }
+  }, [currentToolKey, loadLocalSkills])
 
   useEffect(() => {
-    localDetailRequestRef.current += 1;
-    setLocalDetailSkill(null);
-    setUploadConfirmSkill(null);
-    setPullConfirmSkill(null);
-    setTagFilters(new Set());
-  }, [currentTool?.key]);
+    localDetailRequestRef.current += 1
+    setLocalDetailSkill(null)
+    setUploadConfirmSkill(null)
+    setPullConfirmSkill(null)
+    setTagFilters(new Set())
+  }, [currentTool?.key])
 
   const agentSkills = useMemo(
     () =>
       agentKey
         ? managedSkills.filter((skill) =>
-            skill.targets.some((target) => target.tool === agentKey)
+            skill.targets.some((target) => target.tool === agentKey),
           )
         : [],
-    [agentKey, managedSkills]
-  );
+    [agentKey, managedSkills],
+  )
 
   const allLocalTags = useMemo(() => {
-    const tags = new Set<string>();
+    const tags = new Set<string>()
     for (const skill of localSkills) {
       for (const tag of skill.tags) {
-        if (tag.trim()) tags.add(tag);
+        if (tag.trim()) tags.add(tag)
       }
     }
-    return Array.from(tags).sort((a, b) => a.localeCompare(b));
-  }, [localSkills]);
+    return Array.from(tags).sort((a, b) => a.localeCompare(b))
+  }, [localSkills])
 
   const visibleLocalSkills = useMemo(() => {
-    const q = search.trim().toLowerCase();
+    const q = search.trim().toLowerCase()
     return localSkills
       .filter((skill) => {
         if (q) {
           const matchesQuery =
             skill.name.toLowerCase().includes(q) ||
             skill.dir_name.toLowerCase().includes(q) ||
-            (skill.description || "").toLowerCase().includes(q);
-          if (!matchesQuery) return false;
+            (skill.description || '').toLowerCase().includes(q)
+          if (!matchesQuery) return false
         }
-        if (tagFilters.size > 0 && !skill.tags.some((tag) => tagFilters.has(tag))) return false;
-        return true;
+        if (
+          tagFilters.size > 0 &&
+          !skill.tags.some((tag) => tagFilters.has(tag))
+        )
+          return false
+        return true
       })
       .sort((a, b) => {
-        const priority: Record<ProjectSkill["sync_status"], number> = {
+        const priority: Record<ProjectSkill['sync_status'], number> = {
           project_only: 0,
           project_newer: 1,
           diverged: 2,
           center_newer: 3,
           in_sync: 4,
-        };
+        }
         return (
           priority[a.sync_status] - priority[b.sync_status] ||
           a.name.localeCompare(b.name)
-        );
-      });
-  }, [localSkills, search, tagFilters]);
+        )
+      })
+  }, [localSkills, search, tagFilters])
 
   const inSyncLocalCount = useMemo(
-    () => localSkills.filter((skill) => skill.sync_status === "in_sync").length,
-    [localSkills]
-  );
+    () => localSkills.filter((skill) => skill.sync_status === 'in_sync').length,
+    [localSkills],
+  )
 
-  const installedIds = useMemo(() => new Set(agentSkills.map((s) => s.id)), [agentSkills]);
+  const installedIds = useMemo(
+    () => new Set(agentSkills.map((s) => s.id)),
+    [agentSkills],
+  )
 
   const managedLocalIds = useMemo(
     () =>
       new Set(
         localSkills
           .map((skill) => skill.center_skill_id)
-          .filter((id): id is string => !!id && installedIds.has(id))
+          .filter((id): id is string => !!id && installedIds.has(id)),
       ),
-    [installedIds, localSkills]
-  );
+    [installedIds, localSkills],
+  )
 
   const managedLocalCount = useMemo(
-    () => localSkills.filter((skill) => !!skill.center_skill_id && managedLocalIds.has(skill.center_skill_id)).length,
-    [localSkills, managedLocalIds]
-  );
+    () =>
+      localSkills.filter(
+        (skill) =>
+          !!skill.center_skill_id && managedLocalIds.has(skill.center_skill_id),
+      ).length,
+    [localSkills, managedLocalIds],
+  )
 
   const handleRemoveLocalManagedSkill = async (skill: ProjectSkill) => {
-    if (!agentKey || !skill.center_skill_id || !managedLocalIds.has(skill.center_skill_id)) return;
-    setRemovingLocalSkillId(skill.relative_path);
+    if (
+      !agentKey ||
+      !skill.center_skill_id ||
+      !managedLocalIds.has(skill.center_skill_id)
+    )
+      return
+    setRemovingLocalSkillId(skill.relative_path)
     try {
-      await api.unsyncSkillFromTool(skill.center_skill_id, agentKey);
-      await Promise.all([refreshManagedSkills(), refreshTools(), loadLocalSkills()]);
-      toast.success(t("globalWorkspace.removedToast", { name: skill.name }));
+      await api.unsyncSkillFromTool(skill.center_skill_id, agentKey)
+      await Promise.all([
+        refreshManagedSkills(),
+        refreshTools(),
+        loadLocalSkills(),
+      ])
+      toast.success(t('globalWorkspace.removedToast', { name: skill.name }))
     } catch (e) {
-      toast.error(getErrorMessage(e, t("common.error")));
+      toast.error(getErrorMessage(e, t('common.error')))
     } finally {
-      setRemovingLocalSkillId(null);
+      setRemovingLocalSkillId(null)
     }
-  };
+  }
 
   const handleAddSkills = useCallback(
     async (skillIds: string[]) => {
-      if (!agentKey) return;
+      if (!agentKey) return
       for (const skillId of skillIds) {
-        await api.syncSkillToTool(skillId, agentKey);
+        await api.syncSkillToTool(skillId, agentKey)
       }
-      await Promise.all([refreshManagedSkills(), refreshTools(), loadLocalSkills()]);
-      toast.success(t("globalWorkspace.addedToast", { count: skillIds.length }));
-      setAddDialogOpen(false);
+      await Promise.all([
+        refreshManagedSkills(),
+        refreshTools(),
+        loadLocalSkills(),
+      ])
+      toast.success(t('globalWorkspace.addedToast', { count: skillIds.length }))
+      setAddDialogOpen(false)
     },
-    [agentKey, loadLocalSkills, refreshManagedSkills, refreshTools, t]
-  );
+    [agentKey, loadLocalSkills, refreshManagedSkills, refreshTools, t],
+  )
 
   const handleUploadLocalSkill = useCallback(
     async (skill: ProjectSkill) => {
-      if (!currentTool) return;
-      const key = `upload:${skill.relative_path}`;
-      setLocalActionKey(key);
+      if (!currentTool) return
+      const key = `upload:${skill.relative_path}`
+      setLocalActionKey(key)
       try {
-        await api.importGlobalLocalSkillToCenter(currentTool.key, skill.relative_path);
-        toast.success(t("globalWorkspace.localSkills.uploadedToast", { name: skill.name, agent: currentTool.display_name }));
-        await Promise.all([loadLocalSkills(), refreshManagedSkills()]);
+        await api.importGlobalLocalSkillToCenter(
+          currentTool.key,
+          skill.relative_path,
+        )
+        toast.success(
+          t('globalWorkspace.localSkills.uploadedToast', {
+            name: skill.name,
+            agent: currentTool.display_name,
+          }),
+        )
+        await Promise.all([loadLocalSkills(), refreshManagedSkills()])
       } catch (error: unknown) {
-        toast.error(getErrorMessage(error, t("common.error")));
+        toast.error(getErrorMessage(error, t('common.error')))
       } finally {
-        setLocalActionKey(null);
-        setUploadConfirmSkill(null);
+        setLocalActionKey(null)
+        setUploadConfirmSkill(null)
       }
     },
-    [currentTool, loadLocalSkills, refreshManagedSkills, t]
-  );
+    [currentTool, loadLocalSkills, refreshManagedSkills, t],
+  )
 
   const handlePullLocalSkill = useCallback(
     async (skill: ProjectSkill) => {
-      if (!currentTool) return;
-      const key = `pull:${skill.relative_path}`;
-      setLocalActionKey(key);
+      if (!currentTool) return
+      const key = `pull:${skill.relative_path}`
+      setLocalActionKey(key)
       try {
-        await api.updateGlobalLocalSkillFromCenter(currentTool.key, skill.relative_path);
-        toast.success(t("globalWorkspace.localSkills.pulledToast", { name: skill.name, agent: currentTool.display_name }));
-        await loadLocalSkills();
+        await api.updateGlobalLocalSkillFromCenter(
+          currentTool.key,
+          skill.relative_path,
+        )
+        toast.success(
+          t('globalWorkspace.localSkills.pulledToast', {
+            name: skill.name,
+            agent: currentTool.display_name,
+          }),
+        )
+        await loadLocalSkills()
       } catch (error: unknown) {
-        toast.error(getErrorMessage(error, t("common.error")));
+        toast.error(getErrorMessage(error, t('common.error')))
       } finally {
-        setLocalActionKey(null);
-        setPullConfirmSkill(null);
+        setLocalActionKey(null)
+        setPullConfirmSkill(null)
       }
     },
-    [currentTool, loadLocalSkills, t]
-  );
+    [currentTool, loadLocalSkills, t],
+  )
 
   const openLocalDetail = useCallback(
     async (skill: ProjectSkill) => {
-      if (!currentTool) return;
-      const requestId = localDetailRequestRef.current + 1;
-      localDetailRequestRef.current = requestId;
-      setLocalDetailSkill(skill);
-      setLocalContentTab("local");
-      setLocalDocContent(null);
-      setLocalCenterDocContent(null);
-      setLocalDocLoading(true);
-      setLocalCenterDocLoading(!!skill.center_skill_id);
+      if (!currentTool) return
+      const requestId = localDetailRequestRef.current + 1
+      localDetailRequestRef.current = requestId
+      setLocalDetailSkill(skill)
+      setLocalContentTab('local')
+      setLocalDocContent(null)
+      setLocalCenterDocContent(null)
+      setLocalDocLoading(true)
+      setLocalCenterDocLoading(!!skill.center_skill_id)
 
       api
         .getGlobalLocalSkillDocument(currentTool.key, skill.relative_path)
         .then((doc) => {
-          if (localDetailRequestRef.current === requestId) setLocalDocContent(doc.content);
+          if (localDetailRequestRef.current === requestId)
+            setLocalDocContent(doc.content)
         })
         .catch(() => {
-          if (localDetailRequestRef.current === requestId) setLocalDocContent(null);
+          if (localDetailRequestRef.current === requestId)
+            setLocalDocContent(null)
         })
         .finally(() => {
-          if (localDetailRequestRef.current === requestId) setLocalDocLoading(false);
-        });
+          if (localDetailRequestRef.current === requestId)
+            setLocalDocLoading(false)
+        })
 
       if (skill.center_skill_id) {
         api
           .getSkillDocument(skill.center_skill_id)
           .then((doc) => {
-            if (localDetailRequestRef.current === requestId) setLocalCenterDocContent(doc.content);
+            if (localDetailRequestRef.current === requestId)
+              setLocalCenterDocContent(doc.content)
           })
           .catch(() => {
-            if (localDetailRequestRef.current === requestId) setLocalCenterDocContent(null);
+            if (localDetailRequestRef.current === requestId)
+              setLocalCenterDocContent(null)
           })
           .finally(() => {
-            if (localDetailRequestRef.current === requestId) setLocalCenterDocLoading(false);
-          });
+            if (localDetailRequestRef.current === requestId)
+              setLocalCenterDocLoading(false)
+          })
       }
     },
-    [currentTool]
-  );
+    [currentTool],
+  )
 
   const existsInGlobal = useCallback(
     (skill: ManagedSkill, agentK: string) =>
       skill.targets.some((target) => target.tool === agentK),
-    []
-  );
+    [],
+  )
 
-  const handlePresetAdd = useCallback(async (skill: ManagedSkill, agentK: string) => {
-    await api.syncSkillToTool(skill.id, agentK);
-  }, []);
+  const handlePresetAdd = useCallback(
+    async (skill: ManagedSkill, agentK: string) => {
+      await api.syncSkillToTool(skill.id, agentK)
+    },
+    [],
+  )
 
-  const handlePresetRemove = useCallback(async (skill: ManagedSkill, agentK: string) => {
-    await api.unsyncSkillFromTool(skill.id, agentK);
-  }, []);
+  const handlePresetRemove = useCallback(
+    async (skill: ManagedSkill, agentK: string) => {
+      await api.unsyncSkillFromTool(skill.id, agentK)
+    },
+    [],
+  )
 
   const handlePresetComplete = useCallback(async () => {
-    await Promise.all([refreshManagedSkills(), refreshTools(), loadLocalSkills()]);
-  }, [loadLocalSkills, refreshManagedSkills, refreshTools]);
+    await Promise.all([
+      refreshManagedSkills(),
+      refreshTools(),
+      loadLocalSkills(),
+    ])
+  }, [loadLocalSkills, refreshManagedSkills, refreshTools])
 
-  const renderLocalSkillActions = (skill: ProjectSkill, variant: "grid" | "list") => {
-    const uploadKey = `upload:${skill.relative_path}`;
-    const pullKey = `pull:${skill.relative_path}`;
-    const canPull = skill.sync_status === "center_newer" || skill.sync_status === "diverged";
-    const isInSync = skill.sync_status === "in_sync";
-    const isManaged = !!skill.center_skill_id && managedLocalIds.has(skill.center_skill_id);
-    const removing = removingLocalSkillId === skill.relative_path;
-    const buttonClassName = variant === "grid"
-      ? "rounded px-2 py-1 text-[13px] font-medium text-muted transition-colors outline-none hover:bg-surface-hover hover:text-secondary disabled:opacity-50"
-      : "rounded p-0.5 text-muted transition-colors hover:bg-surface-hover hover:text-secondary disabled:opacity-50";
+  const renderLocalSkillActions = (
+    skill: ProjectSkill,
+    variant: 'grid' | 'list',
+  ) => {
+    const uploadKey = `upload:${skill.relative_path}`
+    const pullKey = `pull:${skill.relative_path}`
+    const canPull =
+      skill.sync_status === 'center_newer' || skill.sync_status === 'diverged'
+    const isInSync = skill.sync_status === 'in_sync'
+    const isManaged =
+      !!skill.center_skill_id && managedLocalIds.has(skill.center_skill_id)
+    const removing = removingLocalSkillId === skill.relative_path
+    const buttonClassName =
+      variant === 'grid'
+        ? 'rounded px-2 py-1 text-[13px] font-medium text-muted transition-colors outline-none hover:bg-surface-hover hover:text-secondary disabled:opacity-50'
+        : 'rounded p-0.5 text-muted transition-colors hover:bg-surface-hover hover:text-secondary disabled:opacity-50'
 
-    if (isInSync && !isManaged) return null;
+    if (isInSync && !isManaged) return null
 
     return (
       <>
         {!isInSync && canPull && (
           <button
             onClick={(e) => {
-              e.stopPropagation();
-              setPullConfirmSkill(skill);
+              e.stopPropagation()
+              setPullConfirmSkill(skill)
             }}
             disabled={localActionKey === pullKey}
             className={buttonClassName}
-            title={t("globalWorkspace.localSkills.pull")}
+            title={t('globalWorkspace.localSkills.pull')}
           >
             {localActionKey === pullKey ? (
               <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -691,16 +809,16 @@ export function GlobalWorkspace() {
         {!isInSync && (
           <button
             onClick={(e) => {
-              e.stopPropagation();
-              if (skill.sync_status === "project_only") {
-                void handleUploadLocalSkill(skill);
+              e.stopPropagation()
+              if (skill.sync_status === 'project_only') {
+                void handleUploadLocalSkill(skill)
               } else {
-                setUploadConfirmSkill(skill);
+                setUploadConfirmSkill(skill)
               }
             }}
             disabled={localActionKey === uploadKey}
             className={buttonClassName}
-            title={t("globalWorkspace.localSkills.upload")}
+            title={t('globalWorkspace.localSkills.upload')}
           >
             {localActionKey === uploadKey ? (
               <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -713,12 +831,15 @@ export function GlobalWorkspace() {
         {isManaged ? (
           <button
             onClick={(e) => {
-              e.stopPropagation();
-              void handleRemoveLocalManagedSkill(skill);
+              e.stopPropagation()
+              void handleRemoveLocalManagedSkill(skill)
             }}
             disabled={removing}
-            title={t("globalWorkspace.localSkills.removeManaged")}
-            className={cn(buttonClassName, "hover:bg-red-500/10 hover:text-red-500")}
+            title={t('globalWorkspace.localSkills.removeManaged')}
+            className={cn(
+              buttonClassName,
+              'hover:bg-red-500/10 hover:text-red-500',
+            )}
           >
             {removing ? (
               <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -728,8 +849,8 @@ export function GlobalWorkspace() {
           </button>
         ) : null}
       </>
-    );
-  };
+    )
+  }
 
   if (installedTools.length === 0) {
     return (
@@ -738,13 +859,15 @@ export function GlobalWorkspace() {
           <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-surface-hover">
             <Globe className="h-5 w-5 text-muted" />
           </div>
-          <p className="text-[13px] font-medium text-secondary">{t("globalWorkspace.noAgents")}</p>
+          <p className="text-[13px] font-medium text-secondary">
+            {t('globalWorkspace.noAgents')}
+          </p>
           <p className="mt-1 max-w-[260px] text-[12px] leading-relaxed text-muted">
-            {t("globalWorkspace.noAgentsHint")}
+            {t('globalWorkspace.noAgentsHint')}
           </p>
         </div>
       </div>
-    );
+    )
   }
 
   if (!currentTool) {
@@ -755,7 +878,7 @@ export function GlobalWorkspace() {
             <div className="min-w-0 flex-1">
               <h1 className="app-page-title flex items-center gap-2.5">
                 <Globe className="h-5 w-5 text-accent" />
-                {t("globalWorkspace.title")}
+                {t('globalWorkspace.title')}
                 <span className="app-badge">{installedTools.length}</span>
               </h1>
             </div>
@@ -776,7 +899,7 @@ export function GlobalWorkspace() {
 
         <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
           {installedTools.map((tool) => {
-            const count = skillCountByAgent[tool.key] ?? 0;
+            const count = skillCountByAgent[tool.key] ?? 0
             return (
               <button
                 key={tool.key}
@@ -789,16 +912,20 @@ export function GlobalWorkspace() {
                   className="h-9 w-9 rounded-lg transition-colors group-hover:border-border"
                 />
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-[13px] font-semibold text-secondary">{tool.display_name}</p>
-                  <p className="text-[12px] text-muted">{t("globalWorkspace.skillCount", { count })}</p>
+                  <p className="truncate text-[13px] font-semibold text-secondary">
+                    {tool.display_name}
+                  </p>
+                  <p className="text-[12px] text-muted">
+                    {t('globalWorkspace.skillCount', { count })}
+                  </p>
                 </div>
                 <ChevronRight className="h-4 w-4 shrink-0 text-faint transition-transform group-hover:translate-x-0.5" />
               </button>
-            );
+            )
           })}
         </div>
       </div>
-    );
+    )
   }
 
   return (
@@ -816,10 +943,13 @@ export function GlobalWorkspace() {
               {currentTool.display_name}
               <span className="app-badge">{localSkills.length}</span>
             </h1>
-            <p className="mt-1 truncate text-[13px] text-muted" title={currentTool.skills_dir}>
+            <p
+              className="mt-1 truncate text-[13px] text-muted"
+              title={currentTool.skills_dir}
+            >
               {compactHomePath(currentTool.skills_dir)}
               <span className="px-1.5">·</span>
-              {t("globalWorkspace.localSkills.summary", {
+              {t('globalWorkspace.localSkills.summary', {
                 total: localSkills.length,
                 managed: managedLocalCount,
                 synced: inSyncLocalCount,
@@ -834,7 +964,7 @@ export function GlobalWorkspace() {
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder={t("globalWorkspace.localSkills.searchPlaceholder")}
+                placeholder={t('globalWorkspace.localSkills.searchPlaceholder')}
                 className="app-input h-9 w-full rounded-md pl-8 font-medium"
                 autoCapitalize="none"
                 autoCorrect="off"
@@ -847,24 +977,33 @@ export function GlobalWorkspace() {
                 onClick={() => void loadLocalSkills()}
                 disabled={localSkillsLoading}
                 className="rounded-md p-2 text-muted transition-colors outline-none hover:text-tertiary disabled:opacity-50"
-                title={t("settings.refresh")}
+                title={t('settings.refresh')}
               >
-                <RefreshCw className={cn("h-4 w-4", localSkillsLoading && "animate-spin")} />
+                <RefreshCw
+                  className={cn(
+                    'h-4 w-4',
+                    localSkillsLoading && 'animate-spin',
+                  )}
+                />
               </button>
               <button
-                onClick={() => setViewMode("grid")}
+                onClick={() => setViewMode('grid')}
                 className={cn(
-                  "rounded-md p-2 transition-colors outline-none",
-                  viewMode === "grid" ? "bg-surface-active text-secondary" : "text-muted hover:text-tertiary"
+                  'rounded-md p-2 transition-colors outline-none',
+                  viewMode === 'grid'
+                    ? 'bg-surface-active text-secondary'
+                    : 'text-muted hover:text-tertiary',
                 )}
               >
                 <LayoutGrid className="h-4 w-4" />
               </button>
               <button
-                onClick={() => setViewMode("list")}
+                onClick={() => setViewMode('list')}
                 className={cn(
-                  "rounded-md p-2 transition-colors outline-none",
-                  viewMode === "list" ? "bg-surface-active text-secondary" : "text-muted hover:text-tertiary"
+                  'rounded-md p-2 transition-colors outline-none',
+                  viewMode === 'list'
+                    ? 'bg-surface-active text-secondary'
+                    : 'text-muted hover:text-tertiary',
                 )}
               >
                 <List className="h-4 w-4" />
@@ -876,46 +1015,50 @@ export function GlobalWorkspace() {
               className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-md bg-accent px-3 text-[13px] font-medium text-white transition-colors hover:bg-accent-hover"
             >
               <Plus className="h-3.5 w-3.5" />
-              {t("globalWorkspace.addSkill")}
+              {t('globalWorkspace.addSkill')}
             </button>
           </div>
         </div>
 
         {allLocalTags.length > 0 && (
           <div className="flex flex-wrap items-center gap-1.5">
-            <span className="text-[12px] text-muted">{t("mySkills.tags.filter")}</span>
+            <span className="text-[12px] text-muted">
+              {t('mySkills.tags.filter')}
+            </span>
             <button
               onClick={() => setTagFilters(new Set())}
               className={cn(
-                "rounded-full px-2.5 py-0.5 text-[12px] font-medium transition-colors",
+                'rounded-full px-2.5 py-0.5 text-[12px] font-medium transition-colors',
                 tagFilters.size === 0
-                  ? "bg-accent text-white dark:bg-accent dark:text-white"
-                  : "bg-surface-hover text-muted hover:text-secondary"
+                  ? 'bg-accent text-white dark:bg-accent dark:text-white'
+                  : 'bg-surface-hover text-muted hover:text-secondary',
               )}
             >
-              {t("mySkills.tags.allTags")}
+              {t('mySkills.tags.allTags')}
             </button>
             {allLocalTags.map((tag) => {
-              const active = tagFilters.has(tag);
+              const active = tagFilters.has(tag)
               return (
                 <button
                   key={tag}
                   onClick={() => {
                     setTagFilters((prev) => {
-                      const next = new Set(prev);
-                      if (next.has(tag)) next.delete(tag);
-                      else next.add(tag);
-                      return next;
-                    });
+                      const next = new Set(prev)
+                      if (next.has(tag)) next.delete(tag)
+                      else next.add(tag)
+                      return next
+                    })
                   }}
                   className={cn(
-                    "rounded-full px-2.5 py-0.5 text-[12px] font-medium transition-colors",
-                    active ? getTagActiveColor(tag, allLocalTags) : getTagColor(tag, allLocalTags)
+                    'rounded-full px-2.5 py-0.5 text-[12px] font-medium transition-colors',
+                    active
+                      ? getTagActiveColor(tag, allLocalTags)
+                      : getTagColor(tag, allLocalTags),
                   )}
                 >
                   {tag}
                 </button>
-              );
+              )
             })}
           </div>
         )}
@@ -937,15 +1080,15 @@ export function GlobalWorkspace() {
       {localSkillsLoading ? (
         <div className="flex items-center gap-2 py-4 text-[13px] text-muted">
           <Loader2 className="h-3.5 w-3.5 animate-spin" />
-          {t("common.loading")}
+          {t('common.loading')}
         </div>
       ) : visibleLocalSkills.length === 0 ? (
         <div className="flex min-h-[260px] flex-col items-center justify-center px-4 text-center">
           <Globe className="mb-4 h-12 w-12 text-faint" />
           <h3 className="mb-1.5 text-[14px] font-semibold text-tertiary">
             {localSkills.length === 0
-              ? t("globalWorkspace.localSkills.empty")
-              : t("mySkills.noMatch")}
+              ? t('globalWorkspace.localSkills.empty')
+              : t('mySkills.noMatch')}
           </h3>
           {localSkills.length === 0 && (
             <button
@@ -953,22 +1096,24 @@ export function GlobalWorkspace() {
               className="mt-4 inline-flex items-center gap-1.5 rounded-md bg-accent px-4 py-2 text-[13px] font-medium text-white transition-colors hover:bg-accent-hover"
             >
               <Plus className="h-3.5 w-3.5" />
-              {t("globalWorkspace.addSkill")}
+              {t('globalWorkspace.addSkill')}
             </button>
           )}
         </div>
       ) : (
         <div
           className={cn(
-            "pb-8",
-            viewMode === "grid"
-              ? "grid grid-cols-2 gap-3 lg:grid-cols-3"
-              : "flex flex-col gap-0.5"
+            'pb-8',
+            viewMode === 'grid'
+              ? 'grid grid-cols-2 gap-3 lg:grid-cols-3'
+              : 'flex flex-col gap-0.5',
           )}
         >
           {visibleLocalSkills.map((skill) => {
-            const statusMeta = getLocalStatusMeta(t, skill.sync_status);
-            const isManaged = !!skill.center_skill_id && managedLocalIds.has(skill.center_skill_id);
+            const statusMeta = getLocalStatusMeta(t, skill.sync_status)
+            const isManaged =
+              !!skill.center_skill_id &&
+              managedLocalIds.has(skill.center_skill_id)
 
             return (
               <WorkspaceSkillCard
@@ -976,15 +1121,18 @@ export function GlobalWorkspace() {
                 viewMode={viewMode}
                 title={skill.name}
                 description={skill.description || skill.relative_path}
-                tags={skill.tags.map((tag) => ({ label: tag, className: getTagColor(tag, allLocalTags) }))}
+                tags={skill.tags.map((tag) => ({
+                  label: tag,
+                  className: getTagColor(tag, allLocalTags),
+                }))}
                 status={statusMeta}
                 fileCount={skill.files.length}
                 active={isManaged}
                 actions={renderLocalSkillActions(skill, viewMode)}
-                actionsHover={viewMode === "list"}
+                actionsHover={viewMode === 'list'}
                 onClick={() => void openLocalDetail(skill)}
               />
-            );
+            )
           })}
         </div>
       )}
@@ -1001,12 +1149,17 @@ export function GlobalWorkspace() {
 
       <DetailSheet
         open={!!localDetailSkill}
-        title={localDetailSkill?.name ?? ""}
+        title={localDetailSkill?.name ?? ''}
         description={localDetailSkill?.description}
         meta={
           localDetailSkill ? (
             <div className="flex flex-wrap items-center gap-2">
-              <span className={cn("rounded-full px-2.5 py-1 text-[12px] font-medium", getLocalStatusMeta(t, localDetailSkill.sync_status).className)}>
+              <span
+                className={cn(
+                  'rounded-full px-2.5 py-1 text-[12px] font-medium',
+                  getLocalStatusMeta(t, localDetailSkill.sync_status).className,
+                )}
+              >
                 {getLocalStatusMeta(t, localDetailSkill.sync_status).label}
               </span>
               <span className="rounded-full bg-surface-hover px-2.5 py-1 text-[12px] text-muted">
@@ -1019,77 +1172,102 @@ export function GlobalWorkspace() {
       >
         {localDetailSkill?.center_skill_id && (
           <div className="mb-4 flex flex-wrap items-center gap-2">
-            {(["local", "diff", "center"] as const).map((tab) => (
+            {(['local', 'diff', 'center'] as const).map((tab) => (
               <button
                 key={tab}
                 type="button"
                 onClick={() => setLocalContentTab(tab)}
                 className={cn(
-                  "rounded-full px-3 py-1.5 text-[12px] font-medium transition-colors",
+                  'rounded-full px-3 py-1.5 text-[12px] font-medium transition-colors',
                   localContentTab === tab
-                    ? "bg-accent text-white"
-                    : "bg-surface-hover text-muted hover:text-secondary"
+                    ? 'bg-accent text-white'
+                    : 'bg-surface-hover text-muted hover:text-secondary',
                 )}
-                disabled={(tab === "diff" || tab === "center") && localCenterDocLoading}
+                disabled={
+                  (tab === 'diff' || tab === 'center') && localCenterDocLoading
+                }
               >
-                {tab === "local"
-                  ? t("mySkills.docTabs.local")
-                  : tab === "diff"
-                    ? t("mySkills.docTabs.diff")
-                    : t("project.docTabs.center")}
+                {tab === 'local'
+                  ? t('mySkills.docTabs.local')
+                  : tab === 'diff'
+                    ? t('mySkills.docTabs.diff')
+                    : t('project.docTabs.center')}
               </button>
             ))}
           </div>
         )}
 
         {localDocLoading ? (
-          <div className="mt-12 text-center text-[13px] text-muted">{t("common.loading")}</div>
-        ) : localContentTab === "diff" ? (
+          <div className="mt-12 text-center text-[13px] text-muted">
+            {t('common.loading')}
+          </div>
+        ) : localContentTab === 'diff' ? (
           localDocContent && localCenterDocContent ? (
-            <DocumentDiffViewer original={localDocContent} updated={localCenterDocContent} />
+            <DocumentDiffViewer
+              original={localDocContent}
+              updated={localCenterDocContent}
+            />
           ) : localCenterDocLoading ? (
-            <div className="mt-12 text-center text-[13px] text-muted">{t("common.loading")}</div>
+            <div className="mt-12 text-center text-[13px] text-muted">
+              {t('common.loading')}
+            </div>
           ) : (
-            <div className="mt-12 text-center text-[13px] text-muted">{t("mySkills.sourceDiffUnavailable")}</div>
+            <div className="mt-12 text-center text-[13px] text-muted">
+              {t('mySkills.sourceDiffUnavailable')}
+            </div>
           )
-        ) : localContentTab === "center" ? (
+        ) : localContentTab === 'center' ? (
           localCenterDocLoading ? (
-            <div className="mt-12 text-center text-[13px] text-muted">{t("common.loading")}</div>
+            <div className="mt-12 text-center text-[13px] text-muted">
+              {t('common.loading')}
+            </div>
           ) : localCenterDocContent ? (
             <SkillMarkdown content={localCenterDocContent} />
           ) : (
-            <div className="mt-12 text-center text-[13px] text-muted">{t("mySkills.sourceDiffUnavailable")}</div>
+            <div className="mt-12 text-center text-[13px] text-muted">
+              {t('mySkills.sourceDiffUnavailable')}
+            </div>
           )
         ) : localDocContent ? (
           <SkillMarkdown content={localDocContent} />
         ) : (
-          <div className="mt-12 text-center text-[13px] text-muted">{t("common.documentMissing")}</div>
+          <div className="mt-12 text-center text-[13px] text-muted">
+            {t('common.documentMissing')}
+          </div>
         )}
       </DetailSheet>
 
       <ConfirmDialog
         open={!!uploadConfirmSkill}
-        title={t("globalWorkspace.localSkills.uploadConfirmTitle")}
-        message={t("globalWorkspace.localSkills.uploadConfirmMessage", {
-          name: uploadConfirmSkill?.name ?? "",
+        title={t('globalWorkspace.localSkills.uploadConfirmTitle')}
+        message={t('globalWorkspace.localSkills.uploadConfirmMessage', {
+          name: uploadConfirmSkill?.name ?? '',
         })}
         tone="warning"
-        confirmLabel={t("globalWorkspace.localSkills.upload")}
+        confirmLabel={t('globalWorkspace.localSkills.upload')}
         onClose={() => setUploadConfirmSkill(null)}
-        onConfirm={() => uploadConfirmSkill ? handleUploadLocalSkill(uploadConfirmSkill) : Promise.resolve()}
+        onConfirm={() =>
+          uploadConfirmSkill
+            ? handleUploadLocalSkill(uploadConfirmSkill)
+            : Promise.resolve()
+        }
       />
       <ConfirmDialog
         open={!!pullConfirmSkill}
-        title={t("globalWorkspace.localSkills.pullConfirmTitle")}
-        message={t("globalWorkspace.localSkills.pullConfirmMessage", {
-          name: pullConfirmSkill?.name ?? "",
-          agent: currentTool?.display_name ?? "",
+        title={t('globalWorkspace.localSkills.pullConfirmTitle')}
+        message={t('globalWorkspace.localSkills.pullConfirmMessage', {
+          name: pullConfirmSkill?.name ?? '',
+          agent: currentTool?.display_name ?? '',
         })}
         tone="danger"
-        confirmLabel={t("globalWorkspace.localSkills.pull")}
+        confirmLabel={t('globalWorkspace.localSkills.pull')}
         onClose={() => setPullConfirmSkill(null)}
-        onConfirm={() => pullConfirmSkill ? handlePullLocalSkill(pullConfirmSkill) : Promise.resolve()}
+        onConfirm={() =>
+          pullConfirmSkill
+            ? handlePullLocalSkill(pullConfirmSkill)
+            : Promise.resolve()
+        }
       />
     </div>
-  );
+  )
 }

@@ -1,276 +1,299 @@
 /* eslint-disable react-refresh/only-export-components */
-import { createContext, useContext, useState, useEffect, useCallback, useRef, type ReactNode } from "react";
-import { listen } from "@tauri-apps/api/event";
-import type { ManagedSkill, Project, Scenario, ToolInfo } from "../lib/tauri";
-import * as api from "../lib/tauri";
-import i18n from "../i18n";
-import { applyTextSize } from "../lib/textScale";
-import { toast } from "sonner";
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+  useRef,
+  type ReactNode,
+} from 'react'
+import { listen } from '@tauri-apps/api/event'
+import type { ManagedSkill, Project, Scenario, ToolInfo } from '../lib/tauri'
+import * as api from '../lib/tauri'
+import i18n from '../i18n'
+import { applyTextSize } from '../lib/textScale'
+import { toast } from 'sonner'
 
 interface AppState {
-  scenarios: Scenario[];
+  scenarios: Scenario[]
   /** Backend-tracked "last applied to default targets". Drives the "Applied to..." status, not the sidebar selection. */
-  activeScenario: Scenario | null;
+  activeScenario: Scenario | null
   /** Frontend-only "currently being viewed/edited" scenario. Persisted to localStorage. UI selection. */
-  viewedScenario: Scenario | null;
-  tools: ToolInfo[];
-  managedSkills: ManagedSkill[];
-  projects: Project[];
-  loading: boolean;
-  appError: string | null;
-  helpOpen: boolean;
-  detailSkillId: string | null;
-  refreshAppData: () => Promise<void>;
-  refreshScenarios: () => Promise<void>;
-  refreshTools: () => Promise<void>;
-  refreshManagedSkills: () => Promise<void>;
-  refreshProjects: () => Promise<void>;
-  setViewedScenarioId: (id: string) => void;
-  applyScenarioToDefault: (id: string) => Promise<void>;
-  clearAppError: () => void;
-  openHelp: () => void;
-  closeHelp: () => void;
-  openSkillDetailById: (skillId: string) => void;
-  closeSkillDetail: () => void;
+  viewedScenario: Scenario | null
+  tools: ToolInfo[]
+  managedSkills: ManagedSkill[]
+  projects: Project[]
+  loading: boolean
+  appError: string | null
+  helpOpen: boolean
+  detailSkillId: string | null
+  refreshAppData: () => Promise<void>
+  refreshScenarios: () => Promise<void>
+  refreshTools: () => Promise<void>
+  refreshManagedSkills: () => Promise<void>
+  refreshProjects: () => Promise<void>
+  setViewedScenarioId: (id: string) => void
+  applyScenarioToDefault: (id: string) => Promise<void>
+  clearAppError: () => void
+  openHelp: () => void
+  closeHelp: () => void
+  openSkillDetailById: (skillId: string) => void
+  closeSkillDetail: () => void
 }
 
-const VIEWED_SCENARIO_LS_KEY = "skills-manager.viewedScenarioId";
+const VIEWED_SCENARIO_LS_KEY = 'skills-manager.viewedScenarioId'
 
-const AppContext = createContext<AppState | null>(null);
+const AppContext = createContext<AppState | null>(null)
 
 export function AppProvider({ children }: { children: ReactNode }) {
-  const SKILL_UPDATE_TOAST_ID = "skill-update-available";
-  const [scenarios, setScenarios] = useState<Scenario[]>([]);
-  const [activeScenario, setActiveScenario] = useState<Scenario | null>(null);
-  const [viewedScenarioId, setViewedScenarioIdState] = useState<string | null>(() => {
-    try {
-      return localStorage.getItem(VIEWED_SCENARIO_LS_KEY);
-    } catch {
-      return null;
-    }
-  });
-  const [tools, setTools] = useState<ToolInfo[]>([]);
-  const [managedSkills, setManagedSkills] = useState<ManagedSkill[]>([]);
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [appError, setAppError] = useState<string | null>(null);
-  const [helpOpen, setHelpOpen] = useState(false);
-  const [detailSkillId, setDetailSkillId] = useState<string | null>(null);
-  const autoCheckInFlightRef = useRef(false);
-  const lastUpdateNotificationRef = useRef<string | null>(null);
+  const SKILL_UPDATE_TOAST_ID = 'skill-update-available'
+  const [scenarios, setScenarios] = useState<Scenario[]>([])
+  const [activeScenario, setActiveScenario] = useState<Scenario | null>(null)
+  const [viewedScenarioId, setViewedScenarioIdState] = useState<string | null>(
+    () => {
+      try {
+        return localStorage.getItem(VIEWED_SCENARIO_LS_KEY)
+      } catch {
+        return null
+      }
+    },
+  )
+  const [tools, setTools] = useState<ToolInfo[]>([])
+  const [managedSkills, setManagedSkills] = useState<ManagedSkill[]>([])
+  const [projects, setProjects] = useState<Project[]>([])
+  const [loading, setLoading] = useState(true)
+  const [appError, setAppError] = useState<string | null>(null)
+  const [helpOpen, setHelpOpen] = useState(false)
+  const [detailSkillId, setDetailSkillId] = useState<string | null>(null)
+  const autoCheckInFlightRef = useRef(false)
+  const lastUpdateNotificationRef = useRef<string | null>(null)
 
   const setTranslatedError = useCallback((key: string) => {
-    setAppError(i18n.t("common.loadFailed", { item: i18n.t(key) }));
-  }, []);
+    setAppError(i18n.t('common.loadFailed', { item: i18n.t(key) }))
+  }, [])
 
   const refreshScenarios = useCallback(async () => {
     try {
       const [s, active] = await Promise.all([
         api.getScenarios(),
         api.getActiveScenario(),
-      ]);
-      setScenarios(s);
-      setActiveScenario(active);
-      setAppError(null);
+      ])
+      setScenarios(s)
+      setActiveScenario(active)
+      setAppError(null)
     } catch (e) {
-      console.error("Failed to load scenarios:", e);
-      setTranslatedError("common.scenarios");
+      console.error('Failed to load scenarios:', e)
+      setTranslatedError('common.scenarios')
     }
-  }, [setTranslatedError]);
+  }, [setTranslatedError])
 
   const refreshTools = useCallback(async () => {
     try {
-      const t = await api.getToolStatus();
-      setTools(t);
-      setAppError(null);
+      const t = await api.getToolStatus()
+      setTools(t)
+      setAppError(null)
     } catch (e) {
-      console.error("Failed to load tools:", e);
-      setTranslatedError("common.agents");
+      console.error('Failed to load tools:', e)
+      setTranslatedError('common.agents')
     }
-  }, [setTranslatedError]);
+  }, [setTranslatedError])
 
   const refreshProjects = useCallback(async () => {
     try {
-      const p = await api.getProjects();
-      setProjects(p);
+      const p = await api.getProjects()
+      setProjects(p)
     } catch (e) {
-      console.error("Failed to load projects:", e);
+      console.error('Failed to load projects:', e)
     }
-  }, []);
+  }, [])
 
   const refreshManagedSkills = useCallback(async () => {
     try {
-      const skills = await api.getManagedSkills();
-      setManagedSkills(skills);
-      setAppError(null);
+      const skills = await api.getManagedSkills()
+      setManagedSkills(skills)
+      setAppError(null)
     } catch (e) {
-      console.error("Failed to load managed skills:", e);
-      setTranslatedError("common.skills");
+      console.error('Failed to load managed skills:', e)
+      setTranslatedError('common.skills')
     }
     // Managed skill changes affect project sync health badges
-    refreshProjects();
-  }, [setTranslatedError, refreshProjects]);
+    refreshProjects()
+  }, [setTranslatedError, refreshProjects])
 
   const refreshAppData = useCallback(async () => {
-    setLoading(true);
-    await Promise.all([refreshScenarios(), refreshTools(), refreshManagedSkills(), refreshProjects()]);
-    setLoading(false);
-  }, [refreshManagedSkills, refreshProjects, refreshScenarios, refreshTools]);
+    setLoading(true)
+    await Promise.all([
+      refreshScenarios(),
+      refreshTools(),
+      refreshManagedSkills(),
+      refreshProjects(),
+    ])
+    setLoading(false)
+  }, [refreshManagedSkills, refreshProjects, refreshScenarios, refreshTools])
 
   const setViewedScenarioId = useCallback((id: string) => {
-    setViewedScenarioIdState(id);
+    setViewedScenarioIdState(id)
     try {
-      localStorage.setItem(VIEWED_SCENARIO_LS_KEY, id);
+      localStorage.setItem(VIEWED_SCENARIO_LS_KEY, id)
     } catch {
       // localStorage may be unavailable; selection is still tracked in memory.
     }
-  }, []);
+  }, [])
 
   const handleApplyScenarioToDefault = useCallback(
     async (id: string) => {
-      await api.applyScenarioToDefault(id);
-      await Promise.all([refreshScenarios(), refreshManagedSkills()]);
+      await api.applyScenarioToDefault(id)
+      await Promise.all([refreshScenarios(), refreshManagedSkills()])
     },
-    [refreshManagedSkills, refreshScenarios]
-  );
+    [refreshManagedSkills, refreshScenarios],
+  )
 
   // Resolve viewedScenario: persisted id > activeScenario > first scenario.
   // Persist whichever resolves so the next launch matches what the user saw.
   const viewedScenario = (() => {
     if (viewedScenarioId) {
-      const found = scenarios.find((s) => s.id === viewedScenarioId);
-      if (found) return found;
+      const found = scenarios.find((s) => s.id === viewedScenarioId)
+      if (found) return found
     }
-    return activeScenario ?? scenarios[0] ?? null;
-  })();
+    return activeScenario ?? scenarios[0] ?? null
+  })()
 
   useEffect(() => {
-    if (!viewedScenario) return;
+    if (!viewedScenario) return
     if (viewedScenario.id !== viewedScenarioId) {
       // Persist the resolved fallback so subsequent reads are stable.
-      setViewedScenarioIdState(viewedScenario.id);
+      setViewedScenarioIdState(viewedScenario.id)
       try {
-        localStorage.setItem(VIEWED_SCENARIO_LS_KEY, viewedScenario.id);
+        localStorage.setItem(VIEWED_SCENARIO_LS_KEY, viewedScenario.id)
       } catch {
         // ignore
       }
     }
-  }, [viewedScenario, viewedScenarioId]);
+  }, [viewedScenario, viewedScenarioId])
 
   useEffect(() => {
     async function init() {
-      await refreshAppData();
+      await refreshAppData()
       // Apply saved text size on startup
-      const savedSize = await api.getSettings("text_size").catch(() => null);
+      const savedSize = await api.getSettings('text_size').catch(() => null)
       if (savedSize) {
-        applyTextSize(savedSize);
+        applyTextSize(savedSize)
       }
     }
-    init();
-  }, [refreshAppData]);
+    init()
+  }, [refreshAppData])
 
   useEffect(() => {
-    const unlistenPromise = listen<string>("tray-scenario-switched", async () => {
-      await Promise.all([refreshScenarios(), refreshManagedSkills()]);
-    });
+    const unlistenPromise = listen<string>(
+      'tray-scenario-switched',
+      async () => {
+        await Promise.all([refreshScenarios(), refreshManagedSkills()])
+      },
+    )
 
     return () => {
       unlistenPromise
         .then((unlisten) => unlisten())
         .catch((error) => {
-          console.error("Failed to unlisten tray-scenario-switched:", error);
-        });
-    };
-  }, [refreshManagedSkills, refreshScenarios]);
+          console.error('Failed to unlisten tray-scenario-switched:', error)
+        })
+    }
+  }, [refreshManagedSkills, refreshScenarios])
 
   useEffect(() => {
-    let refreshTimer: ReturnType<typeof setTimeout> | null = null;
+    let refreshTimer: ReturnType<typeof setTimeout> | null = null
 
-    const unlistenPromise = listen("app-files-changed", () => {
+    const unlistenPromise = listen('app-files-changed', () => {
       if (refreshTimer) {
-        clearTimeout(refreshTimer);
+        clearTimeout(refreshTimer)
       }
       refreshTimer = setTimeout(() => {
         refreshAppData().catch((error) => {
-          console.error("Failed to refresh after filesystem change:", error);
-        });
-      }, 500);
-    });
+          console.error('Failed to refresh after filesystem change:', error)
+        })
+      }, 500)
+    })
 
     return () => {
       if (refreshTimer) {
-        clearTimeout(refreshTimer);
+        clearTimeout(refreshTimer)
       }
       unlistenPromise
         .then((unlisten) => unlisten())
         .catch((error) => {
-          console.error("Failed to unlisten app-files-changed:", error);
-        });
-    };
-  }, [refreshAppData]);
+          console.error('Failed to unlisten app-files-changed:', error)
+        })
+    }
+  }, [refreshAppData])
 
   // Auto-check skill updates on startup (non-blocking, silent)
   useEffect(() => {
-    if (loading || managedSkills.length === 0) return;
+    if (loading || managedSkills.length === 0) return
     const hasGitSkills = managedSkills.some(
-      (s) => s.source_type === "git" || s.source_type === "skillssh"
-    );
-    if (!hasGitSkills || autoCheckInFlightRef.current) return;
+      (s) => s.source_type === 'git' || s.source_type === 'skillssh',
+    )
+    if (!hasGitSkills || autoCheckInFlightRef.current) return
 
     // Delay to avoid slowing down initial render
     const timer = setTimeout(() => {
-      autoCheckInFlightRef.current = true;
-      api.checkAllSkillUpdates(false)
+      autoCheckInFlightRef.current = true
+      api
+        .checkAllSkillUpdates(false)
         .then(async () => {
-          const skills = await api.getManagedSkills();
-          setManagedSkills(skills);
+          const skills = await api.getManagedSkills()
+          setManagedSkills(skills)
           const updatable = skills
-            .filter((s) => s.update_status === "update_available")
-            .sort((a, b) => a.id.localeCompare(b.id));
+            .filter((s) => s.update_status === 'update_available')
+            .sort((a, b) => a.id.localeCompare(b.id))
 
           if (updatable.length === 0) {
-            lastUpdateNotificationRef.current = null;
-            toast.dismiss(SKILL_UPDATE_TOAST_ID);
-            return;
+            lastUpdateNotificationRef.current = null
+            toast.dismiss(SKILL_UPDATE_TOAST_ID)
+            return
           }
 
-          const notificationSignature = updatable.map((skill) => skill.id).join("|");
+          const notificationSignature = updatable
+            .map((skill) => skill.id)
+            .join('|')
           if (lastUpdateNotificationRef.current === notificationSignature) {
-            return;
+            return
           }
 
-          lastUpdateNotificationRef.current = notificationSignature;
+          lastUpdateNotificationRef.current = notificationSignature
           if (updatable.length > 0) {
             toast.info(
-              i18n.t("mySkills.updateNotification", { count: updatable.length }),
+              i18n.t('mySkills.updateNotification', {
+                count: updatable.length,
+              }),
               {
                 id: SKILL_UPDATE_TOAST_ID,
                 duration: 8000,
                 action: {
-                  label: i18n.t("mySkills.viewUpdates"),
+                  label: i18n.t('mySkills.viewUpdates'),
                   onClick: () => {
-                    setDetailSkillId(null);
+                    setDetailSkillId(null)
                     // Navigate to My Skills without opening a specific detail panel.
                     // AppProvider is outside Router, so use pushState + popstate
                     // to preserve SPA state.
-                    if (!window.location.pathname.endsWith("/my-skills")) {
-                      window.history.pushState(null, "", "/my-skills");
-                      window.dispatchEvent(new PopStateEvent("popstate"));
+                    if (!window.location.pathname.endsWith('/my-skills')) {
+                      window.history.pushState(null, '', '/my-skills')
+                      window.dispatchEvent(new PopStateEvent('popstate'))
                     }
                   },
                 },
-              }
-            );
+              },
+            )
           }
         })
         .catch(() => {}) // silent failure
         .finally(() => {
-          autoCheckInFlightRef.current = false;
-        });
-    }, 3000);
-    return () => clearTimeout(timer);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loading]);
+          autoCheckInFlightRef.current = false
+        })
+    }, 3000)
+    return () => clearTimeout(timer)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading])
 
   return (
     <AppContext.Provider
@@ -301,11 +324,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
     >
       {children}
     </AppContext.Provider>
-  );
+  )
 }
 
 export function useApp() {
-  const ctx = useContext(AppContext);
-  if (!ctx) throw new Error("useApp must be used within AppProvider");
-  return ctx;
+  const ctx = useContext(AppContext)
+  if (!ctx) throw new Error('useApp must be used within AppProvider')
+  return ctx
 }
