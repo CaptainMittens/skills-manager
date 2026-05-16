@@ -43,7 +43,7 @@ export interface SkillCardActions {
   onRemoveTag: (tag: string) => void
   tagEditing: boolean
   tagInput: string
-  tagInputRef: React.RefObject<HTMLInputElement>
+  tagInputRef: React.RefObject<HTMLInputElement | null>
   tagOptions: string[]
   onTagInputChange: (v: string) => void
   onAddTag: (value?: string) => void
