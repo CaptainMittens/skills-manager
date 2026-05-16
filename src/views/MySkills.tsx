@@ -56,6 +56,7 @@ import {
   closestCenter,
   KeyboardSensor,
   PointerSensor,
+  getClientRect,
   useSensor,
   useSensors,
   type DragEndEvent,
@@ -388,14 +389,19 @@ export function MySkills() {
     setActiveDragId(String(e.active.id))
     try {
       const ae = e.activatorEvent as PointerEvent | undefined
+      // NOTE: active.rect.current.initial is legitimately null at onDragStart time.
+      // @dnd-kit sets activeRects.current.initial = draggingNodeRect, but
+      // draggingNodeRect is null while status===Initializing (isInitialized=false,
+      // core.esm.js:2948). The initial rect is only populated after the first
+      // render following drag activation. We capture it in onDragMove instead.
       setDndProbe({
         activeId: String(e.active.id),
         activatorClientX: ae?.clientX ?? null,
         activatorClientY: ae?.clientY ?? null,
-        initialLeft: e.active.rect.current.initial?.left ?? null,
-        initialTop: e.active.rect.current.initial?.top ?? null,
-        initialWidth: e.active.rect.current.initial?.width ?? null,
-        initialHeight: e.active.rect.current.initial?.height ?? null,
+        initialLeft: null,
+        initialTop: null,
+        initialWidth: null,
+        initialHeight: null,
         translatedLeft: null,
         translatedTop: null,
         deltaX: null,
@@ -417,7 +423,14 @@ export function MySkills() {
     requestAnimationFrame(() => {
       _rafPending.current = false
       try {
+        // active.rect.current.initial is populated once Status.Initialized is
+        // reached (after activeNodeRect is first measured). Read it here so the
+        // probe reflects the true source-card base rect.
         setDndProbe({
+          initialLeft: e.active.rect.current.initial?.left ?? null,
+          initialTop: e.active.rect.current.initial?.top ?? null,
+          initialWidth: e.active.rect.current.initial?.width ?? null,
+          initialHeight: e.active.rect.current.initial?.height ?? null,
           translatedLeft: e.active.rect.current.translated?.left ?? null,
           translatedTop: e.active.rect.current.translated?.top ?? null,
           deltaX: e.delta.x,
@@ -1724,6 +1737,21 @@ export function MySkills() {
         <DndContext
           sensors={sensors}
           collisionDetection={closestCenter}
+          measuring={{
+            dragOverlay: {
+              // Use transform-agnostic measurement so the overlay's frozen base
+              // rect reflects the source card's un-transformed viewport position.
+              // Without this, getBoundingClientRect() captures the overlay after
+              // its CSS transform is already applied (the ref connects 1+ render
+              // cycle after drag start, by which time the cursor has moved and a
+              // non-zero transform is in effect). That causes draggingNodeRect to
+              // be pre-offset, and getAdjustedRect() then double-adds the motion.
+              // core.esm.js:2436-2441: ResizeObserver only updates w/h, not top/left,
+              // so this initial measurement is frozen for the entire drag gesture.
+              measure: (node: HTMLElement) =>
+                getClientRect(node, { ignoreTransform: true }),
+            },
+          }}
           onDragStart={handleDragStart}
           onDragMove={handleDragMove}
           onDragEnd={handleDragEnd}
