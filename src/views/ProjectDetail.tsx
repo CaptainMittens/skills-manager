@@ -180,7 +180,6 @@ export function ProjectDetail() {
     loadSkills,
     exportTargets,
     findProjectPresetVariant,
-    setDetailSkill,
     selectedExportAgents,
     getSkillKey,
     selectedSkills,

@@ -18,7 +18,6 @@ interface UseProjectSkillMutationsParams {
     skill: ManagedSkill,
     agentKey: string,
   ) => ProjectSkill | null
-  setDetailSkill: Dispatch<SetStateAction<ProjectSkillGroup | null>>
   selectedExportAgents: string[]
   // from ProjectDetail UI state
   getSkillKey: (skill: Pick<ProjectSkillGroup, 'id'>) => string
