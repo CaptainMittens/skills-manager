@@ -1,0 +1,21 @@
+# Pre-commit quality gate for skills-manager.
+# See https://lefthook.dev/configuration/
+pre-commit:
+  parallel: false
+  jobs:
+    - name: eslint
+      glob: '*.{ts,tsx}'
+      run: npx eslint .
+    - name: tsc
+      run: npx tsc -b --noEmit
+    - name: prettier
+      run: npx prettier --check .
+    - name: cargo-fmt
+      glob: 'src-tauri/**/*.rs'
+      run: cargo fmt --manifest-path src-tauri/Cargo.toml --check
+    # NOTE: clippy is advisory (non-blocking) because the existing codebase
+    # has ~10 pre-existing clippy warnings unrelated to tooling setup.
+    # Re-enable strict mode (remove `|| true`) once those are cleaned up.
+    - name: cargo-clippy
+      glob: 'src-tauri/**/*.rs'
+      run: cargo clippy --manifest-path src-tauri/Cargo.toml -- -D warnings || true

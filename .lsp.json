@@ -1,0 +1,22 @@
+{
+  "typescript": {
+    "command": "npx",
+    "args": ["typescript-language-server", "--stdio"],
+    "extensionToLanguage": {
+      ".ts": "typescript",
+      ".tsx": "typescript",
+      ".js": "javascript",
+      ".jsx": "javascript"
+    },
+    "transport": "stdio",
+    "startupTimeout": 60000
+  },
+  "rust": {
+    "command": "rust-analyzer",
+    "args": [],
+    "extensionToLanguage": {
+      ".rs": "rust"
+    },
+    "transport": "stdio"
+  }
+}
