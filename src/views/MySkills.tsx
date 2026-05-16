@@ -54,11 +54,14 @@ import {
   DndContext,
   DragOverlay,
   closestCenter,
+  pointerWithin,
+  rectIntersection,
   KeyboardSensor,
   PointerSensor,
   getClientRect,
   useSensor,
   useSensors,
+  type CollisionDetection,
   type DragEndEvent,
   type DragMoveEvent,
   type DragStartEvent,
@@ -73,6 +76,14 @@ import {
 import { CSS } from '@dnd-kit/utilities'
 
 import { setDndProbe } from '../lib/dndProbeState'
+
+const collisionDetectionStrategy: CollisionDetection = (args) => {
+  const pointerCollisions = pointerWithin(args)
+  if (pointerCollisions.length > 0) return pointerCollisions
+  const rectCollisions = rectIntersection(args)
+  if (rectCollisions.length > 0) return rectCollisions
+  return closestCenter(args)
+}
 
 interface SortableSkillItemProps {
   id: string
@@ -1736,7 +1747,7 @@ export function MySkills() {
       ) : (
         <DndContext
           sensors={sensors}
-          collisionDetection={closestCenter}
+          collisionDetection={collisionDetectionStrategy}
           measuring={{
             dragOverlay: {
               // Use transform-agnostic measurement so the overlay's frozen base
