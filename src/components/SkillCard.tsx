@@ -12,7 +12,7 @@ import {
   SquareCheck,
   X,
 } from 'lucide-react'
-import type React from 'react'
+import React, { memo } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { ManagedSkill, ToolInfo } from '../lib/tauri'
 import { getTagColor } from '../lib/skillTags'
@@ -84,9 +84,86 @@ function sourceTypeLabel(skill: ManagedSkill) {
   return skill.source_type === 'skillssh' ? 'skills.sh' : skill.source_type
 }
 
+// ── Memo comparator ───────────────────────────────────────────────────────────
+//
+// Callback props (onCardClick, onCheckUpdate, on*, onAddTag, etc.) are
+// intentionally EXCLUDED from comparison. They are inline arrow closures
+// recreated each render of MySkills, but their behaviour is stable — they
+// close over `skill` and stable handler functions and never change semantics
+// between renders. Including them would defeat the entire purpose of memo
+// because they always have a new identity. Excluding them is safe because
+// the PRIMITIVE state flags they depend on (isSelected, isDeleting, …) ARE
+// in the compared set and will trigger a re-render whenever the callback
+// output would actually differ.
+//
+// ReactNode props (dragHandle, deleteSlot) ARE compared by identity because
+// they may carry meaningful structural changes (e.g. different button state).
+// In practice they are stable across unrelated state changes.
+
+function areEqual(prev: SkillCardProps, next: SkillCardProps): boolean {
+  // Top-level scalar / identity props
+  if (
+    prev.skill !== next.skill ||
+    prev.variant !== next.variant ||
+    prev.displayName !== next.displayName ||
+    prev.isSynced !== next.isSynced ||
+    prev.enabledInScenario !== next.enabledInScenario ||
+    prev.viewedScenarioName !== next.viewedScenarioName ||
+    prev.allTags !== next.allTags ||
+    prev.tools !== next.tools
+  ) {
+    return false
+  }
+
+  // badge: structural comparison (plain object or null)
+  const pb = prev.badge
+  const nb = next.badge
+  if (pb !== nb) {
+    if (pb === null || nb === null) return false
+    if (pb.label !== nb.label || pb.className !== nb.className) return false
+  }
+
+  // actions presence change
+  const pa = prev.actions
+  const na = next.actions
+  if ((pa === undefined) !== (na === undefined)) return false
+  if (pa === undefined) return true // both undefined → equal
+
+  // Primitive state flags that affect rendered output
+  if (
+    pa.isMultiSelect !== na!.isMultiSelect ||
+    pa.isSelected !== na!.isSelected ||
+    pa.isDeleting !== na!.isDeleting ||
+    pa.isChecking !== na!.isChecking ||
+    pa.isUpdating !== na!.isUpdating ||
+    pa.canRefresh !== na!.canRefresh ||
+    pa.isMissingLocalSource !== na!.isMissingLocalSource ||
+    pa.togglingTool !== na!.togglingTool ||
+    pa.tagEditing !== na!.tagEditing ||
+    pa.tagInput !== na!.tagInput
+  ) {
+    return false
+  }
+
+  // tagOptions: compare by identity first, then by content
+  if (pa.tagOptions !== na!.tagOptions) {
+    const po = pa.tagOptions
+    const no = na!.tagOptions
+    if (po.length !== no.length || po.join('\0') !== no.join('\0')) return false
+  }
+
+  // ReactNode slots — compare by identity
+  if (pa.dragHandle !== na!.dragHandle || pa.deleteSlot !== na!.deleteSlot) {
+    return false
+  }
+
+  // All render-affecting fields are equal; callbacks excluded by design
+  return true
+}
+
 // ── Component ─────────────────────────────────────────────────────────────────
 
-export function SkillCard({
+function SkillCardInner({
   skill,
   variant,
   displayName,
@@ -137,6 +214,8 @@ export function SkillCard({
     />
   )
 }
+
+export const SkillCard = memo(SkillCardInner, areEqual)
 
 // ── Grid layout ───────────────────────────────────────────────────────────────
 
