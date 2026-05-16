@@ -7,6 +7,5 @@ export const TEXT_SIZE_SCALE_MAP: Record<string, string> = {
 
 export function applyTextSize(size: string) {
   const scale = TEXT_SIZE_SCALE_MAP[size] || TEXT_SIZE_SCALE_MAP.default
-  document.documentElement.style.zoom = scale
-  document.documentElement.style.setProperty('--app-scale', scale)
+  document.documentElement.style.fontSize = `${parseFloat(scale) * 100}%`
 }
