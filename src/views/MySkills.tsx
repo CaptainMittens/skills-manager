@@ -28,6 +28,7 @@ import { toast } from 'sonner'
 import { cn } from '../utils'
 import { useApp } from '../context/AppContext'
 import { useMultiSelect } from '../hooks/useMultiSelect'
+import { useTagSkillToPreset } from '../hooks/useTagSkillToPreset'
 import { ConfirmDialog } from '../components/ConfirmDialog'
 import { DeleteSkillButton } from '../components/DeleteSkillButton'
 import { SkillDetailPanel } from '../components/SkillDetailPanel'
@@ -36,6 +37,7 @@ import { BatchTagDialog } from '../components/BatchTagDialog'
 import { GitSetupDialog } from '../components/GitSetupDialog'
 import { GitRecoveryDialog } from '../components/GitRecoveryDialog'
 import { SyncDots } from '../components/SyncDots'
+import { PresetDropChips } from '../components/PresetDropChips'
 import * as api from '../lib/tauri'
 import { getTagActiveColor, getTagColor } from '../lib/skillTags'
 import type {
@@ -140,6 +142,7 @@ export function MySkills() {
     viewedScenario,
     tools,
     managedSkills: skills,
+    scenarios,
     refreshScenarios,
     refreshManagedSkills,
     detailSkillId,
@@ -322,10 +325,20 @@ export function MySkills() {
     }),
   )
 
+  const tagSkillToPreset = useTagSkillToPreset()
+
   const handleDragEnd = useCallback(
     async (event: DragEndEvent) => {
       const { active, over } = event
-      if (!over || active.id === over.id || !viewedScenario) return
+      if (!over || active.id === over.id) return
+
+      // NEW: preset-tag branch — checked before reorder, independent of viewedScenario
+      if (scenarios.some((s) => s.id === over.id)) {
+        await tagSkillToPreset(String(active.id), String(over.id))
+        return
+      }
+
+      if (!viewedScenario) return
 
       // Only reorder enabled skills (they are always at the front)
       const enabledSkills = filtered.filter((s) =>
@@ -355,7 +368,7 @@ export function MySkills() {
           .catch(() => {})
       }
     },
-    [filtered, viewedScenario],
+    [filtered, viewedScenario, scenarios, tagSkillToPreset],
   )
 
   const canDrag = !!viewedScenario
@@ -1626,6 +1639,7 @@ export function MySkills() {
           collisionDetection={closestCenter}
           onDragEnd={handleDragEnd}
         >
+          <PresetDropChips scenarios={scenarios} />
           <SortableContext
             items={filtered.map((s) => s.id)}
             strategy={
