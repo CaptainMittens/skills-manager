@@ -35,7 +35,7 @@ pub fn hash_directory(dir: &Path) -> Result<String> {
             use std::os::unix::fs::PermissionsExt;
             if let Ok(meta) = entry.path().metadata() {
                 let mode = meta.permissions().mode();
-                hasher.update(&(mode & 0o111).to_le_bytes());
+                hasher.update((mode & 0o111).to_le_bytes());
             }
         }
     }

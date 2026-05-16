@@ -13,9 +13,6 @@ pre-commit:
     - name: cargo-fmt
       glob: 'src-tauri/**/*.rs'
       run: cargo fmt --manifest-path src-tauri/Cargo.toml --check
-    # NOTE: clippy is advisory (non-blocking) because the existing codebase
-    # has ~10 pre-existing clippy warnings unrelated to tooling setup.
-    # Re-enable strict mode (remove `|| true`) once those are cleaned up.
     - name: cargo-clippy
       glob: 'src-tauri/**/*.rs'
-      run: cargo clippy --manifest-path src-tauri/Cargo.toml -- -D warnings || true
+      run: cargo clippy --manifest-path src-tauri/Cargo.toml -- -D warnings

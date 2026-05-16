@@ -25,6 +25,7 @@ impl RepoLock {
         let lock_path = base.join(LOCK_FILE_NAME);
         let mut file = OpenOptions::new()
             .create(true)
+            .truncate(false)
             .read(true)
             .write(true)
             .open(&lock_path)
@@ -53,7 +54,7 @@ impl RepoLock {
 
 impl Drop for RepoLock {
     fn drop(&mut self) {
-        let _ = self.file.unlock();
+        let _ = fs2::FileExt::unlock(&self.file);
     }
 }
 
