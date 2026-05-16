@@ -200,6 +200,38 @@ npm run tauri:build
 npm run cli:build
 ```
 
+## Contributing / Development Setup
+
+Before your first commit, install all required toolchain components so the pre-commit gate passes:
+
+```bash
+# Install Node dependencies (includes ESLint, Prettier, Vitest, TypeScript)
+npm install
+
+# Add required Rust components
+rustup component add rust-analyzer clippy rustfmt
+```
+
+Every commit runs a blocking pre-commit gate (via [Lefthook](https://github.com/evilmartians/lefthook)) that checks all of the following — **all must pass**:
+
+| Check      | Command                                                            |
+| ---------- | ------------------------------------------------------------------ |
+| ESLint     | `npx eslint .`                                                     |
+| TypeScript | `npx tsc -b --noEmit`                                              |
+| Prettier   | `npx prettier --check .`                                           |
+| Rust fmt   | `cargo fmt --manifest-path src-tauri/Cargo.toml --check`           |
+| Clippy     | `cargo clippy --manifest-path src-tauri/Cargo.toml -- -D warnings` |
+
+Optional helpers:
+
+```bash
+# Auto-fix formatting before committing
+npm run format
+
+# Run the Vitest smoke suite
+npm test
+```
+
 ## Troubleshooting
 
 ### macOS: Gatekeeper blocks the app on first launch

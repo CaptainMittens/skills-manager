@@ -32,7 +32,10 @@ dist-ssr
 *.sw?
 
 .claude
-docs
+docs/*
+!docs/lsp-ledger.md
+!docs/handoffs/
+!docs/handoffs/**
 reference
 CLAUDE.md
 .loop-log
