@@ -212,39 +212,42 @@ export function useProjectSkills() {
     }
   }, [exportTargets])
 
-  const handleOpenDetail = async (skill: ProjectSkillGroup) => {
-    setDetailSkill(skill)
-    setDocContent(null)
-    setDocLoading(true)
-    setCenterDocContent(null)
-    setCenterDocLoading(false)
-    if (!project || !id) return
-
-    const centerSkillId =
-      skill.centerSkillIds.length > 0 ? skill.centerSkillIds[0] : null
-
-    if (centerSkillId) {
-      setCenterDocLoading(true)
-      api
-        .getSkillDocument(centerSkillId)
-        .then((doc) => setCenterDocContent(doc.content))
-        .catch(() => setCenterDocContent(null))
-        .finally(() => setCenterDocLoading(false))
-    }
-
-    try {
-      const doc = await api.getProjectSkillDocument(
-        id,
-        skill.primaryVariant.relative_path,
-        skill.primaryVariant.agent,
-      )
-      setDocContent(doc.content)
-    } catch {
+  const handleOpenDetail = useCallback(
+    async (skill: ProjectSkillGroup) => {
+      setDetailSkill(skill)
       setDocContent(null)
-    } finally {
-      setDocLoading(false)
-    }
-  }
+      setDocLoading(true)
+      setCenterDocContent(null)
+      setCenterDocLoading(false)
+      if (!project || !id) return
+
+      const centerSkillId =
+        skill.centerSkillIds.length > 0 ? skill.centerSkillIds[0] : null
+
+      if (centerSkillId) {
+        setCenterDocLoading(true)
+        api
+          .getSkillDocument(centerSkillId)
+          .then((doc) => setCenterDocContent(doc.content))
+          .catch(() => setCenterDocContent(null))
+          .finally(() => setCenterDocLoading(false))
+      }
+
+      try {
+        const doc = await api.getProjectSkillDocument(
+          id,
+          skill.primaryVariant.relative_path,
+          skill.primaryVariant.agent,
+        )
+        setDocContent(doc.content)
+      } catch {
+        setDocContent(null)
+      } finally {
+        setDocLoading(false)
+      }
+    },
+    [project, id],
+  )
 
   return {
     id,
