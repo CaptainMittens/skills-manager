@@ -50,6 +50,7 @@ import type {
 import { getErrorMessage, getErrorKind } from '../lib/error'
 import {
   DndContext,
+  DragOverlay,
   closestCenter,
   KeyboardSensor,
   MeasuringStrategy,
@@ -93,7 +94,7 @@ function SortableSkillItem({
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
-    opacity: isDragging ? 0.5 : undefined,
+    opacity: isDragging ? 0 : undefined,
   }
 
   const handle = !disabled ? (
@@ -328,8 +329,11 @@ export function MySkills() {
 
   const tagSkillToPreset = useTagSkillToPreset()
 
+  const [activeDragId, setActiveDragId] = useState<string | null>(null)
+
   const handleDragEnd = useCallback(
     async (event: DragEndEvent) => {
+      setActiveDragId(null)
       const { active, over } = event
       if (!over || active.id === over.id) return
 
@@ -369,7 +373,7 @@ export function MySkills() {
           .catch(() => {})
       }
     },
-    [filtered, viewedScenario, scenarios, tagSkillToPreset],
+    [filtered, viewedScenario, scenarios, tagSkillToPreset, setActiveDragId],
   )
 
   const canDrag = !!viewedScenario
@@ -1638,7 +1642,9 @@ export function MySkills() {
         <DndContext
           sensors={sensors}
           collisionDetection={closestCenter}
+          onDragStart={(e) => setActiveDragId(String(e.active.id))}
           onDragEnd={handleDragEnd}
+          onDragCancel={() => setActiveDragId(null)}
           measuring={{ droppable: { strategy: MeasuringStrategy.Always } }}
         >
           <PresetDropChips scenarios={scenarios} />
@@ -2174,6 +2180,114 @@ export function MySkills() {
               })}
             </div>
           </SortableContext>
+          <DragOverlay>
+            {activeDragId
+              ? (() => {
+                  const activeSkill = filtered.find(
+                    (s) => s.id === activeDragId,
+                  )
+                  if (!activeSkill) return null
+                  const isSynced = activeSkill.targets.length > 0
+                  const badge = statusBadge(activeSkill)
+                  const displayName =
+                    skillDisplayNames.get(activeSkill.id) || activeSkill.name
+                  if (viewMode === 'grid') {
+                    return (
+                      <div
+                        className={cn(
+                          'app-panel relative flex h-full cursor-grabbing flex-col shadow-xl',
+                          activeSkill.scenario_ids.includes(
+                            viewedScenario?.id ?? '',
+                          ) && 'border-l-2 border-l-accent',
+                        )}
+                      >
+                        <div className="flex items-center gap-2.5 px-3.5 pr-20 pt-3 pb-1.5">
+                          {isSynced ? (
+                            <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-emerald-500" />
+                          ) : (
+                            <Circle className="h-3.5 w-3.5 shrink-0 text-faint" />
+                          )}
+                          <h3
+                            className="flex-1 truncate text-[14px] font-semibold text-primary"
+                            title={displayName}
+                          >
+                            {displayName}
+                          </h3>
+                        </div>
+                        <div className="px-3.5 pb-3">
+                          <p className="text-[13px] leading-[18px] text-muted truncate">
+                            {activeSkill.description || '—'}
+                          </p>
+                          {badge && (
+                            <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                              <span
+                                className={cn(
+                                  'rounded-full px-2 py-0.5 text-[13px] font-medium',
+                                  badge.className,
+                                )}
+                              >
+                                {badge.label}
+                              </span>
+                            </div>
+                          )}
+                          <div className="mt-2 flex flex-wrap items-center gap-1">
+                            {activeSkill.tags.map((tag) => (
+                              <span
+                                key={tag}
+                                className={cn(
+                                  'inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium',
+                                  getTagColor(tag, allTags),
+                                )}
+                              >
+                                {tag}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    )
+                  }
+                  return (
+                    <div
+                      className={cn(
+                        'app-panel relative flex cursor-grabbing items-center gap-3.5 rounded-xl border-transparent px-3.5 py-3 shadow-xl',
+                        activeSkill.scenario_ids.includes(
+                          viewedScenario?.id ?? '',
+                        ) && 'border-l-2 border-l-accent',
+                      )}
+                    >
+                      {isSynced ? (
+                        <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-emerald-500" />
+                      ) : (
+                        <Circle className="h-3.5 w-3.5 shrink-0 text-faint" />
+                      )}
+                      <h3
+                        className="w-[180px] shrink-0 truncate text-[14px] font-semibold text-secondary"
+                        title={displayName}
+                      >
+                        {displayName}
+                      </h3>
+                      <p className="min-w-0 flex-1 truncate text-[13px] text-muted">
+                        {activeSkill.description || '—'}
+                      </p>
+                      <div className="flex shrink-0 items-center gap-1.5">
+                        {activeSkill.tags.map((tag) => (
+                          <span
+                            key={tag}
+                            className={cn(
+                              'inline-flex items-center rounded-full px-1.5 py-0.5 text-[11px] font-medium',
+                              getTagColor(tag, allTags),
+                            )}
+                          >
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )
+                })()
+              : null}
+          </DragOverlay>
         </DndContext>
       )}
 
