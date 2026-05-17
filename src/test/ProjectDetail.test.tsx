@@ -5,6 +5,7 @@ import {
   useContext,
   useState,
   useCallback,
+  StrictMode,
   type ReactNode,
 } from 'react'
 import { ProjectDetail } from '../views/ProjectDetail'
@@ -252,12 +253,82 @@ describe('ProjectDetail', () => {
     )
 
     // After the toggle+reload completes, loading must return to false.
-    // Pre-fix: the view gets stuck on "common.loading" after loadSkills() is triggered.
     await waitFor(
       () => {
         expect(screen.queryByText('common.loading')).not.toBeInTheDocument()
       },
       { timeout: 3000 },
     )
+  })
+
+  it('resolves loading even when a concurrent loadSkills call hangs (StrictMode regression)', async () => {
+    // Root-cause proof for the 06a9635 regression:
+    //
+    // React 18 StrictMode (used in production) runs every effect TWICE:
+    // mount → fake-unmount → remount. Crucially, useRef is PRESERVED across the
+    // fake-unmount/remount cycle, so both runs share the same loadInFlightRef.
+    //
+    // With the loadInFlightRef counter (06a9635):
+    //   • Run 1: counter 0 → 1, api call A in-flight
+    //   • Run 2: counter 1 → 2, api call B in-flight
+    //   • A resolves: counter 2 → 1 (≠ 0) → setLoading NOT called → still true
+    //   • B hangs forever → counter never reaches 0 → loading PERMANENTLY stuck
+    //
+    // With the original simple `finally { setLoading(false) }`:
+    //   • A resolves: setLoading(false) immediately → loading = false → FIXED
+    //   • B can hang freely; loading is already cleared
+
+    let callCount = 0
+    const resolvers: Array<() => void> = []
+
+    mockGetProjectSkills.mockImplementation(() => {
+      const n = ++callCount
+      return new Promise<(typeof MOCK_SKILL)[]>((resolve) => {
+        if (n === 1) {
+          // First call resolves after a short delay (simulates a fast IPC response).
+          setTimeout(() => resolve([MOCK_SKILL]), 10)
+        } else {
+          // Second call (StrictMode's remount) hangs forever — simulates a Tauri
+          // IPC call that never returns (the exact production failure mode).
+          resolvers.push(() => resolve([MOCK_SKILL]))
+        }
+      })
+    })
+
+    render(
+      // StrictMode mirrors the production environment (main.tsx wraps the whole app).
+      <StrictMode>
+        <MockAppProvider>
+          <ProjectDetail />
+        </MockAppProvider>
+      </StrictMode>,
+    )
+
+    // Wait for at least 2 getProjectSkills calls (StrictMode fires the effect twice).
+    await waitFor(
+      () => {
+        expect(callCount).toBeGreaterThanOrEqual(2)
+      },
+      { timeout: 3000 },
+    )
+
+    // The first call completes (10ms). Loading should now resolve to false.
+    //
+    // WITH loadInFlightRef (broken): counter is 2 → 1 after call 1; call 2 hangs
+    //   → counter never reaches 0 → "common.loading" stays forever → TEST FAILS.
+    //
+    // WITHOUT loadInFlightRef (fixed): call 1's finally runs setLoading(false)
+    //   unconditionally → loading = false → TEST PASSES.
+    await waitFor(
+      () => {
+        expect(screen.queryByText('common.loading')).not.toBeInTheDocument()
+      },
+      { timeout: 3000 },
+    )
+
+    // Resolve the hanging call so the test can clean up without dangling promises.
+    act(() => {
+      resolvers.forEach((r) => r())
+    })
   })
 })

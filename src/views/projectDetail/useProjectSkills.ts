@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useApp } from '../../context/AppContext'
 import * as api from '../../lib/tauri'
@@ -33,14 +33,8 @@ export function useProjectSkills() {
 
   const project = projects.find((p) => p.id === id)
 
-  // Track concurrent loadSkills calls. loading stays true until every
-  // in-flight call has settled — prevents a race where refreshProjects()
-  // causes a re-render mid-fetch that resets the loading flag prematurely.
-  const loadInFlightRef = useRef(0)
-
   const loadSkills = useCallback(async () => {
     if (!id) return
-    loadInFlightRef.current += 1
     setLoading(true)
     try {
       const result = await api.getProjectSkills(id)
@@ -48,10 +42,7 @@ export function useProjectSkills() {
     } catch (e) {
       console.error('Failed to load project skills:', e)
     } finally {
-      loadInFlightRef.current -= 1
-      if (loadInFlightRef.current === 0) {
-        setLoading(false)
-      }
+      setLoading(false)
     }
   }, [id])
 
