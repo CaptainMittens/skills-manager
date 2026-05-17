@@ -28,7 +28,14 @@ import { ProjectSkillDetailPanel } from './projectDetail/ProjectSkillDetailPanel
 
 export function ProjectDetail() {
   const { t } = useTranslation()
-  const { scenarios, managedSkills } = useApp()
+  const {
+    projects,
+    scenarios,
+    managedSkills,
+    refreshManagedSkills,
+    refreshScenarios,
+    refreshProjects,
+  } = useApp()
   const {
     id,
     loading,
@@ -48,7 +55,7 @@ export function ProjectDetail() {
     centerDocLoading,
     loadSkills,
     handleOpenDetail,
-  } = useProjectSkills()
+  } = useProjectSkills({ projects })
 
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   const [filterMode, setFilterMode] = useState<'all' | 'enabled' | 'disabled'>(
@@ -177,6 +184,10 @@ export function ProjectDetail() {
     handlePresetActionComplete,
   } = useProjectSkillMutations({
     id,
+    managedSkills,
+    refreshManagedSkills,
+    refreshScenarios,
+    refreshProjects,
     loadSkills,
     exportTargets,
     findProjectPresetVariant,

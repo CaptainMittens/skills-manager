@@ -2,7 +2,6 @@ import { useState, useCallback } from 'react'
 import type { Dispatch, SetStateAction } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
-import { useApp } from '../../context/AppContext'
 import * as api from '../../lib/tauri'
 import type { ManagedSkill, ProjectAgentTarget } from '../../lib/tauri'
 import { getErrorMessage } from '../../lib/error'
@@ -11,6 +10,11 @@ import type { ProjectSkill } from '../../lib/tauri'
 
 interface UseProjectSkillMutationsParams {
   id: string | undefined
+  // from AppContext (hoisted to ProjectDetail to consolidate useApp() calls)
+  managedSkills: ManagedSkill[]
+  refreshManagedSkills: () => Promise<void>
+  refreshScenarios: () => Promise<void>
+  refreshProjects: () => Promise<void>
   // from useProjectSkills hook
   loadSkills: () => Promise<void>
   exportTargets: ProjectAgentTarget[]
@@ -32,6 +36,10 @@ interface UseProjectSkillMutationsParams {
 
 export function useProjectSkillMutations({
   id,
+  managedSkills,
+  refreshManagedSkills,
+  refreshScenarios,
+  refreshProjects,
   loadSkills,
   exportTargets,
   findProjectPresetVariant,
@@ -46,12 +54,6 @@ export function useProjectSkillMutations({
   exitMultiSelect,
 }: UseProjectSkillMutationsParams) {
   const { t } = useTranslation()
-  const {
-    managedSkills,
-    refreshManagedSkills,
-    refreshScenarios,
-    refreshProjects,
-  } = useApp()
 
   const [updatingCenterSkill, setUpdatingCenterSkill] = useState<string | null>(
     null,

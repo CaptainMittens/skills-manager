@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { useApp } from '../../context/AppContext'
 import * as api from '../../lib/tauri'
 import type {
+  Project,
   ProjectSkill,
   ManagedSkill,
   ProjectAgentTarget,
@@ -14,10 +14,13 @@ import {
   getGroupStatus,
 } from './projectSkillUtils'
 
-export function useProjectSkills() {
+interface UseProjectSkillsParams {
+  projects: Project[]
+}
+
+export function useProjectSkills({ projects }: UseProjectSkillsParams) {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const { projects } = useApp()
 
   const [skills, setSkills] = useState<ProjectSkill[]>([])
   const [projectAgentTargets, setProjectAgentTargets] = useState<
